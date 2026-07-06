@@ -628,7 +628,7 @@ houses.forEach((h,i)=>{
 
   card.className='card reveal d'+((i%3)+1);
   card.innerHTML=`
-    <a class="scene-link" href="${href}"><div class="scene">${scene(h.type)}<div class="price-tag">${fmt(h.price)} ₽<small>/сутки</small></div></div></a>
+    <a class="scene-link" href="${href}"><div class="scene">${scene(h.type)}<div class="price-tag">${h.priceFrom?'от ':''}${fmt(h.price)} ₽<small>/сутки</small></div></div></a>
     <div class="card-body">
       <h3><a href="${href}">${h.name}</a></h3>
       <div class="loc">${h.loc}</div>
