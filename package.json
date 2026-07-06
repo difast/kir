@@ -1,0 +1,26 @@
+{
+  "name": "zagorod-booking",
+  "version": "1.0.0",
+  "description": "Лендинг аренды загородных домов посуточно с бэкендом приёма заявок (Telegram + e-mail)",
+  "main": "server/index.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node --watch server/index.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "booking",
+    "express",
+    "telegram",
+    "nodemailer"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "nodemailer": "^6.9.14"
+  }
+}
