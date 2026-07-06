@@ -62,41 +62,63 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 .hero{position:relative;height:100vh;min-height:640px;overflow:hidden;color:var(--on-dark)}
 /* .sky = финальное «рассветное» состояние (видно при отключённой анимации) */
 .sky{position:absolute;inset:0;background:linear-gradient(180deg,
-   #0A2430 0%, #123F3D 34%, #2E5748 56%, #8A6238 78%, #E7A64C 100%);}
-/* .sky-night перекрывает небо ночью и растворяется — эффект рассвета */
+   #10233C 0%, #2E4A63 28%, #6C6E88 48%, #C97E6B 70%, #F2A96B 86%, #FBD79A 100%);}
+/* ночь растворяется — эффект морского рассвета */
 .sky-night{position:absolute;inset:0;opacity:0;background:linear-gradient(180deg,
-   #03060F 0%, #071522 40%, #0B2130 62%, #10262E 82%, #223038 100%);
+   #060A1E 0%, #0C1230 42%, #17203F 66%, #2A2E4A 100%);
    animation:dawnSky 5.2s ease-out forwards}
-@keyframes dawnSky{0%{opacity:1}55%{opacity:.55}100%{opacity:0}}
-/* тёплое зарево у горизонта разгорается */
-.dawn-glow{position:absolute;left:0;right:0;bottom:0;height:60%;opacity:1;pointer-events:none;
-   background:radial-gradient(130% 100% at 50% 100%,rgba(255,201,120,.6) 0%,rgba(231,166,76,.28) 34%,transparent 68%);
+@keyframes dawnSky{0%{opacity:1}55%{opacity:.5}100%{opacity:0}}
+/* тёплое зарево у горизонта */
+.dawn-glow{position:absolute;left:0;right:0;bottom:0;height:64%;opacity:1;pointer-events:none;
+   background:radial-gradient(120% 92% at 50% 100%,rgba(255,186,120,.65) 0%,rgba(233,120,88,.28) 34%,transparent 66%);
    animation:dawnBloom 5.2s ease-out forwards}
-@keyframes dawnBloom{0%{opacity:0}40%{opacity:.35}100%{opacity:1}}
-/* солнце восходит из-за леса и разгорается */
+@keyframes dawnBloom{0%{opacity:0}40%{opacity:.4}100%{opacity:1}}
+/* солнце восходит над морем */
 .sun{
-  position:absolute;left:50%;bottom:23%;width:230px;height:230px;
-  transform:translateX(-50%) translateY(0) scale(1);opacity:1;
-  border-radius:50%;
-  background:radial-gradient(circle,#FFF0CC 0%,#FBD98A 26%,#F3B85C 46%,rgba(231,166,76,.32) 64%,transparent 74%);
-  filter:blur(2px);
-  animation:sunrise 5.2s cubic-bezier(.22,.68,.24,1) forwards;
+  position:absolute;left:50%;bottom:30%;width:220px;height:220px;
+  transform:translateX(-50%) translateY(0) scale(1);opacity:1;border-radius:50%;
+  background:radial-gradient(circle,#FFF3D6 0%,#FBD98A 24%,#F6A85A 46%,rgba(233,140,80,.3) 64%,transparent 74%);
+  filter:blur(2px);animation:sunrise 5.2s cubic-bezier(.22,.68,.24,1) forwards;
 }
 @keyframes sunrise{
-  0%{opacity:0;transform:translateX(-50%) translateY(190px) scale(.62)}
-  28%{opacity:.65}
+  0%{opacity:0;transform:translateX(-50%) translateY(160px) scale(.6)}
+  30%{opacity:.7}
   100%{opacity:1;transform:translateX(-50%) translateY(0) scale(1)}
 }
+/* блик-дорожка солнца на воде, мягко мерцает */
+.sea-glow{position:absolute;left:50%;bottom:0;width:170px;height:40%;transform:translateX(-50%);
+  pointer-events:none;opacity:0;mix-blend-mode:screen;filter:blur(3px);
+  background:linear-gradient(180deg,rgba(255,214,150,.9) 0%,rgba(251,190,110,.35) 42%,transparent 100%);
+  animation:glowIn 5.2s ease-out forwards, shimmer 3.8s ease-in-out 5.2s infinite}
+@keyframes glowIn{0%,55%{opacity:0}100%{opacity:.9}}
+@keyframes shimmer{0%,100%{opacity:.55;transform:translateX(-50%) scaleX(.9)}50%{opacity:1;transform:translateX(-50%) scaleX(1.18)}}
+/* тёплая дымка дрейфует */
+.clouds{position:absolute;inset:0;pointer-events:none;overflow:hidden;opacity:.5}
+.cloud{position:absolute;height:56px;border-radius:50%;filter:blur(16px);background:radial-gradient(closest-side,rgba(255,205,160,.55),transparent)}
+.cloud.c1{top:17%;width:340px;animation:drift1 48s linear infinite}
+.cloud.c2{top:29%;width:250px;height:42px;animation:drift2 66s linear infinite}
+@keyframes drift1{from{transform:translateX(-360px)}to{transform:translateX(102vw)}}
+@keyframes drift2{from{transform:translateX(-280px)}to{transform:translateX(104vw)}}
 /* звёзды гаснут к рассвету, но продолжают мерцать */
 .stars{position:absolute;inset:0;opacity:.14;animation:starsFade 5.2s ease-out forwards}
-@keyframes starsFade{0%{opacity:1}60%{opacity:.55}100%{opacity:.14}}
+@keyframes starsFade{0%{opacity:1}60%{opacity:.5}100%{opacity:.14}}
 .stars i{position:absolute;width:2px;height:2px;background:#fff;border-radius:50%;opacity:.85;animation:tw 4s ease-in-out infinite}
 @keyframes tw{0%,100%{opacity:.2}50%{opacity:.9}}
+/* море */
+.sea{position:absolute;left:0;right:0;bottom:0;height:38%;
+  background:linear-gradient(180deg,#3E6472 0%,#24505A 55%,#15363E 100%)}
+.sea::before{content:"";position:absolute;inset:0;
+  background:repeating-linear-gradient(180deg,rgba(255,255,255,.05) 0 1px,transparent 1px 15px)}
+/* слои силуэтов (горы / холмы / берег) */
 .layer{position:absolute;left:0;right:0;bottom:0;will-change:transform}
-.layer svg{display:block;width:100%;height:auto}
-.hero-house{position:absolute;left:50%;bottom:8%;transform:translateX(-50%);width:190px;will-change:transform}
+.layer svg{display:block;width:100%;height:100%}
+#lyr-far{height:60%;opacity:.85}
+#lyr-mid{height:42%}
+#lyr-near{height:16%}
+/* южная вилла с кипарисами (окна светятся) */
+.hero-house{position:absolute;left:72%;bottom:9%;transform:translateX(-50%);width:230px;will-change:transform}
 .hero-house .win{fill:#FBD98A;animation:glow 3.5s ease-in-out infinite}
-@keyframes glow{0%,100%{opacity:.75}50%{opacity:1}}
+@keyframes glow{0%,100%{opacity:.7}50%{opacity:1}}
 
 .hero-veil{position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,36,48,.35) 0%,transparent 34%,transparent 60%,rgba(12,29,22,.55) 100%)}
 
@@ -341,32 +363,42 @@ footer a:hover{color:var(--honey)}
 <header class="hero" id="top">
   <div class="sky"></div>
   <div class="sky-night"></div>
-  <div class="sun"></div>
-  <div class="dawn-glow"></div>
   <div class="stars" id="stars"></div>
+  <div class="clouds"><span class="cloud c1"></span><span class="cloud c2"></span></div>
 
-  <!-- far forest -->
-  <div class="layer" id="lyr-far" style="opacity:.55">
-    <svg viewBox="0 0 1440 260" preserveAspectRatio="none"><path fill="#0E3230" d="M0 260 L0 150 40 120 90 165 150 100 210 160 280 90 350 155 430 110 500 170 580 115 660 175 740 105 820 165 900 120 980 172 1060 108 1140 168 1220 118 1300 172 1380 128 1440 165 1440 260Z"/></svg>
+  <!-- дальние горы (Кавказ) -->
+  <div class="layer" id="lyr-far">
+    <svg viewBox="0 0 1440 300" preserveAspectRatio="none"><path fill="#3A4E63" d="M0 300 L0 120 150 60 300 150 430 92 560 182 720 222 880 176 1010 96 1150 152 1290 70 1440 132 1440 300Z"/></svg>
   </div>
-  <!-- mid forest -->
-  <div class="layer" id="lyr-mid" style="opacity:.8">
-    <svg viewBox="0 0 1440 220" preserveAspectRatio="none"><path fill="#0A2622" d="M0 220 L0 120 60 70 120 130 190 60 260 128 340 78 420 140 500 72 590 138 680 66 770 134 860 80 950 142 1040 74 1130 136 1220 72 1310 140 1390 90 1440 130 1440 220Z"/></svg>
+  <!-- ближние холмы у берега -->
+  <div class="layer" id="lyr-mid">
+    <svg viewBox="0 0 1440 300" preserveAspectRatio="none"><path fill="#1E3A3E" d="M0 300 L0 178 Q220 132 430 172 Q560 196 720 236 Q900 200 1080 166 Q1250 136 1440 186 L1440 300Z"/></svg>
   </div>
 
-  <!-- house -->
-  <svg class="hero-house" viewBox="0 0 200 170" fill="none">
-    <path d="M100 14 L182 78 V158 H18 V78 Z" fill="#0A1F1A" stroke="#153a30" stroke-width="2"/>
-    <path d="M100 14 L182 78 H18 Z" fill="#0E2A22"/>
-    <rect x="44" y="96" width="26" height="26" class="win"/>
-    <rect x="130" y="96" width="26" height="26" class="win"/>
-    <rect x="86" y="112" width="28" height="46" fill="#B77C34"/>
-    <rect class="win" x="92" y="120" width="16" height="8" opacity=".9"/>
-  </svg>
-  <!-- near forest -->
+  <div class="dawn-glow"></div>
+  <div class="sun"></div>
+  <div class="sea"></div>
+  <div class="sea-glow"></div>
+
+  <!-- береговая линия (передний план) -->
   <div class="layer" id="lyr-near">
-    <svg viewBox="0 0 1440 150" preserveAspectRatio="none"><path fill="#061914" d="M0 150 L0 96 70 40 140 100 220 44 300 104 390 50 480 108 570 42 670 108 760 54 860 110 960 46 1060 108 1160 52 1260 110 1360 60 1440 100 1440 150Z"/></svg>
+    <svg viewBox="0 0 1440 120" preserveAspectRatio="none"><path fill="#0A1A1E" d="M0 120 L0 72 Q360 48 720 60 T1440 66 L1440 120Z"/></svg>
   </div>
+
+  <!-- южная вилла с кипарисами -->
+  <svg class="hero-house" viewBox="0 0 260 170" fill="none">
+    <path d="M26 168 C14 128 16 76 26 40 C36 76 38 128 26 168Z" fill="#0B1A1E"/>
+    <path d="M236 168 C226 132 228 84 236 52 C244 84 246 132 236 168Z" fill="#0B1A1E"/>
+    <rect x="74" y="86" width="112" height="82" fill="#17272E"/>
+    <rect x="168" y="112" width="40" height="56" fill="#142127"/>
+    <path d="M66 86 L92 66 L168 66 L194 86 Z" fill="#6E3A2B"/>
+    <path d="M162 112 L188 96 L214 112 Z" fill="#5E3324"/>
+    <path class="win" d="M92 130 V112 a10 10 0 0 1 20 0 V130 Z"/>
+    <path class="win" d="M148 130 V112 a10 10 0 0 1 20 0 V130 Z"/>
+    <rect x="122" y="132" width="20" height="36" fill="#5A3A24"/>
+    <rect class="win" x="127" y="138" width="10" height="9" opacity=".9"/>
+    <rect class="win" x="180" y="126" width="16" height="16" rx="3"/>
+  </svg>
 
   <div class="hero-veil"></div>
 
