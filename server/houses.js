@@ -20,7 +20,7 @@ const HOUSES = [
   },
   {
     id: 'dom35',
-    name: 'Уютный дом у моря',
+    name: 'Новый дом у Олимпийского парка',
     price: 3500,
     cap: 4,
     status: 'active',

@@ -108,6 +108,19 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 .nav-links a:hover{opacity:1}
 .nav-cta{border:1px solid rgba(236,228,211,.4);padding:10px 20px;border-radius:100px;font-size:.82rem;font-weight:600;transition:.35s}
 .nav-cta:hover{background:var(--on-dark);color:var(--ink)}
+/* телефон + telegram в шапке */
+.nav-actions{display:flex;align-items:center;gap:14px}
+.nav-phone{font-size:.9rem;font-weight:700;white-space:nowrap;transition:opacity .3s}
+.nav-phone:hover{opacity:.7}
+.tg-ic{width:36px;height:36px;border-radius:50%;border:1px solid rgba(236,228,211,.4);display:grid;place-items:center;transition:.35s;flex:none}
+.tg-ic svg{width:18px;height:18px}
+.tg-ic svg path{fill:var(--on-dark);transition:fill .35s}
+.tg-ic:hover{background:var(--honey);border-color:var(--honey)}
+.tg-ic:hover svg path{fill:var(--ink)}
+@media(max-width:520px){.nav-phone{display:none}}
+/* telegram-ссылка в подвале */
+.f-tg{display:inline-flex;align-items:center;gap:7px}
+.f-tg svg{width:15px;height:15px;fill:currentColor}
 
 .hero-inner{position:relative;z-index:5;height:100%;display:flex;flex-direction:column;justify-content:center}
 .hero-copy{max-width:760px;animation:heroRise 1.4s cubic-bezier(.16,.8,.3,1) .5s both}
@@ -168,7 +181,7 @@ section{position:relative}
 
 /* stats */
 .stats{background:var(--pine);color:var(--on-dark)}
-.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px}
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
 .stat{padding:30px 6px;border-top:1px solid rgba(236,228,211,.16)}
 .stat .num{font-family:'Cormorant',serif;font-size:clamp(2.8rem,5vw,4.4rem);color:var(--honey);line-height:1}
 .stat .lbl{margin-top:10px;color:var(--on-dark-mut);font-size:.94rem}
@@ -253,49 +266,7 @@ footer a:hover{color:var(--honey)}
 .fcol div{margin-bottom:8px}
 .fnote{width:100%;border-top:1px solid rgba(236,228,211,.12);margin-top:36px;padding-top:24px;font-size:.8rem}
 
-/* ======================================================= modal */
-.modal{position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;padding:20px}
-.modal.open{display:flex}
-.modal-bg{position:absolute;inset:0;background:rgba(9,20,15,.66);backdrop-filter:blur(4px);animation:fade .3s ease}
-@keyframes fade{from{opacity:0}to{opacity:1}}
-.modal-box{position:relative;background:var(--cream);border-radius:26px;width:min(560px,100%);max-height:92vh;overflow:auto;box-shadow:var(--shadow);animation:pop .4s cubic-bezier(.16,.8,.3,1)}
-@keyframes pop{from{opacity:0;transform:translateY(30px) scale(.97)}to{opacity:1;transform:none}}
-.modal-top{position:relative;padding:26px 30px 22px;background:var(--pine);color:var(--on-dark)}
-.modal-top .eyebrow{color:var(--honey)}
-.modal-top h3{font-size:2rem;margin-top:6px}
-.modal-top .m-house{font-size:.94rem;color:var(--on-dark-mut);margin-top:4px}
-.close{position:absolute;top:18px;right:18px;width:38px;height:38px;border-radius:50%;background:rgba(236,228,211,.14);color:var(--on-dark);font-size:1.2rem;display:grid;place-items:center;transition:.3s}
-.close:hover{background:rgba(236,228,211,.28);transform:rotate(90deg)}
-.modal-form{padding:26px 30px 30px}
-.row{display:flex;gap:14px;margin-bottom:16px}
-.grp{flex:1;display:flex;flex-direction:column}
-.grp label{font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:6px}
-.grp input,.grp select{
-  border:1px solid var(--line);background:#fff;padding:13px 14px;border-radius:12px;font-family:inherit;font-size:.98rem;font-weight:500;color:var(--text);outline:none;transition:.25s
-}
-.grp input:focus,.grp select:focus{border-color:var(--amber);box-shadow:0 0 0 3px rgba(231,166,76,.16)}
-.err{color:var(--clay);font-size:.78rem;margin-top:5px;display:none}
-.grp.invalid input,.grp.invalid select{border-color:var(--clay)}
-.grp.invalid .err{display:block}
-.summary{background:var(--birch);border-radius:14px;padding:16px 18px;margin:6px 0 20px;font-size:.94rem}
-.summary .line{display:flex;justify-content:space-between;padding:4px 0;color:var(--muted)}
-.summary .total{display:flex;justify-content:space-between;padding-top:12px;margin-top:8px;border-top:1px solid var(--line);font-weight:700;color:var(--text);font-size:1.14rem}
-.submit{width:100%;background:var(--pine);color:var(--on-dark);padding:17px;border-radius:14px;font-weight:700;font-size:1rem;transition:.35s}
-.submit:hover{background:var(--amber);color:var(--ink)}
-.submit:disabled{opacity:.7;cursor:default;background:var(--pine);color:var(--on-dark);transform:none}
-/* сообщение об ошибке отправки заявки */
-.submit-err{color:var(--clay);font-size:.9rem;font-weight:600;text-align:center;margin-bottom:14px;display:none}
-/* honeypot — скрыт от людей, ловит ботов */
-.hp{position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden}
-
-.success{padding:44px 34px;text-align:center;animation:fade .5s ease}
-.success .ok{width:76px;height:76px;border-radius:50%;background:var(--pine);margin:0 auto 22px;display:grid;place-items:center}
-.success .ok svg{width:38px;height:38px}
-.success h3{font-size:2.2rem}
-.success p{color:var(--muted);margin:10px 0 18px}
-.success .ref{display:inline-block;background:var(--birch);padding:12px 22px;border-radius:12px;font-weight:700;letter-spacing:.05em;margin-bottom:26px}
-.success .again{background:var(--pine);color:var(--on-dark);padding:13px 28px;border-radius:100px;font-weight:700;transition:.35s}
-.success .again:hover{background:var(--amber);color:var(--ink)}
+/* модальное окно бронирования — стили в /modal.css, разметка/логика в /booking.js */
 
 /* ======================================================= responsive */
 @media(max-width:920px){
@@ -330,19 +301,23 @@ footer a:hover{color:var(--honey)}
   html{scroll-behavior:auto}
 }
 </style>
+<link rel="stylesheet" href="/modal.css">
 </head>
 <body>
 
 <!-- ===================== STICKY DOCK ===================== -->
 <div class="dock" id="dock">
   <div class="wrap">
-    <div class="brand"><svg class="mk" viewBox="0 0 40 40" fill="none"><path d="M20 4 L34 16 V34 H24 V24 H16 V34 H6 V16 Z" stroke="#E7A64C" stroke-width="2.2" stroke-linejoin="round"/><rect x="17" y="12" width="6" height="6" fill="#E7A64C"/></svg>Загород</div>
+    <div class="brand"><svg class="mk" viewBox="0 0 40 40" fill="none"><path d="M20 4 L34 16 V34 H24 V24 H16 V34 H6 V16 Z" stroke="#E7A64C" stroke-width="2.2" stroke-linejoin="round"/><rect x="17" y="12" width="6" height="6" fill="#E7A64C"/></svg>GreenPark</div>
     <div class="dock-mid">
-      <span><b>120+</b> домов</span>
       <span><b>4.9</b> рейтинг</span>
       <span>заезд <b>за 5 минут</b></span>
     </div>
-    <button onclick="openModal()">Забронировать</button>
+    <div class="nav-actions">
+      <a class="nav-phone" href="tel:+79000000000">+7 900 000-00-00</a>
+      <a class="tg-ic" href="https://t.me/greenpark" target="_blank" rel="noopener" aria-label="Telegram"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21.94 4.28 2.9 11.63c-1.03.4-1.02 1.86.02 2.24l4.64 1.68 1.8 5.55c.28.86 1.36 1.11 1.98.45l2.57-2.72 4.75 3.48c.66.48 1.6.12 1.78-.68l3.2-14.4c.2-.9-.68-1.66-1.7-1.27ZM9.7 15.1l-.28 3.9-1.2-3.98 9.4-6.1-7.92 6.18Z"/></svg></a>
+      <button onclick="openModal()">Забронировать</button>
+    </div>
   </div>
 </div>
 
@@ -380,20 +355,24 @@ footer a:hover{color:var(--honey)}
   <div class="hero-veil"></div>
 
   <nav class="nav wrap" style="width:min(1200px,92vw)">
-    <div class="brand"><svg class="mk" viewBox="0 0 40 40" fill="none"><path d="M20 4 L34 16 V34 H24 V24 H16 V34 H6 V16 Z" stroke="#E7A64C" stroke-width="2.2" stroke-linejoin="round"/><rect x="17" y="12" width="6" height="6" fill="#E7A64C"/></svg>Загород</div>
+    <div class="brand"><svg class="mk" viewBox="0 0 40 40" fill="none"><path d="M20 4 L34 16 V34 H24 V24 H16 V34 H6 V16 Z" stroke="#E7A64C" stroke-width="2.2" stroke-linejoin="round"/><rect x="17" y="12" width="6" height="6" fill="#E7A64C"/></svg>GreenPark</div>
     <div class="nav-links">
       <a href="#houses">Дома</a>
       <a href="#how">Как забронировать</a>
       <a href="#reviews">Отзывы</a>
     </div>
-    <button class="nav-cta" onclick="openModal()">Забронировать</button>
+    <div class="nav-actions">
+      <a class="nav-phone" href="tel:+79000000000">+7 900 000-00-00</a>
+      <a class="tg-ic" href="https://t.me/greenpark" target="_blank" rel="noopener" aria-label="Telegram"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21.94 4.28 2.9 11.63c-1.03.4-1.02 1.86.02 2.24l4.64 1.68 1.8 5.55c.28.86 1.36 1.11 1.98.45l2.57-2.72 4.75 3.48c.66.48 1.6.12 1.78-.68l3.2-14.4c.2-.9-.68-1.66-1.7-1.27ZM9.7 15.1l-.28 3.9-1.2-3.98 9.4-6.1-7.92 6.18Z"/></svg></a>
+      <button class="nav-cta" onclick="openModal()">Забронировать</button>
+    </div>
   </nav>
 
   <div class="hero-inner wrap" style="width:min(1200px,92vw)">
     <div class="hero-copy">
       <span class="eyebrow">Дома посуточно • за городом</span>
       <h1>Тишина, лес<br>и <em>тёплый дом</em><br>на выходные</h1>
-      <p class="hero-sub">Выберите дом с баней, камином и видом на озеро. Заселение за 5 минут, без залогов и лишних звонков.</p>
+      <p class="hero-sub">Дома в Сочи с бассейном, зоной барбекю и зелёной территорией. Рядом Олимпийский парк, до моря — 7 минут. Бесконтактное заселение и тишина.</p>
 
       <div class="search" id="searchBar">
         <div class="field">
@@ -427,14 +406,13 @@ footer a:hover{color:var(--honey)}
   <div class="wrap">
     <div class="head reveal">
       <span class="eyebrow">Почему у нас</span>
-      <h2>Загород без хлопот</h2>
+      <h2>GreenPark без хлопот</h2>
       <p>Мы сами содержим каждый дом — поэтому отвечаем за чистоту, тепло и настроение вашего отдыха.</p>
     </div>
     <div class="stats-grid">
-      <div class="stat reveal d1"><div class="num" data-count="120" data-suf="+">0</div><div class="lbl">домов в собственном управлении</div></div>
-      <div class="stat reveal d2"><div class="num" data-count="4.9" data-dec="1">0</div><div class="lbl">средний рейтинг гостей</div></div>
-      <div class="stat reveal d3"><div class="num" data-count="5" data-suf=" мин">0</div><div class="lbl">на заселение по онлайн-ключу</div></div>
-      <div class="stat reveal d4"><div class="num" data-count="14000" data-suf="+">0</div><div class="lbl">ночей провели наши гости</div></div>
+      <div class="stat reveal d1"><div class="num" data-count="4.9" data-dec="1">0</div><div class="lbl">средний рейтинг гостей</div></div>
+      <div class="stat reveal d2"><div class="num" data-count="5" data-suf=" мин">0</div><div class="lbl">на заселение по онлайн-ключу</div></div>
+      <div class="stat reveal d3"><div class="num" data-count="14000" data-suf="+">0</div><div class="lbl">ночей провели наши гости</div></div>
     </div>
   </div>
 </section>
@@ -486,7 +464,7 @@ footer a:hover{color:var(--honey)}
   <div class="wrap reveal">
     <span class="eyebrow" style="color:var(--honey)">Свободные даты ещё есть</span>
     <h2>Забронируйте дом<br>на ближайшие выходные</h2>
-    <p>Подтверждение за 15 минут. Оплата после подтверждения. Отмена бесплатно за 3 дня до заезда.</p>
+    <p>Подтверждение за 15 минут. Оплата после подтверждения.</p>
     <button class="big-btn" onclick="openModal()">Выбрать дом и даты</button>
   </div>
 </section>
@@ -496,98 +474,26 @@ footer a:hover{color:var(--honey)}
   <div class="wrap">
     <div class="fcol">
       <div class="brand" style="font-family:'Cormorant',serif;font-size:1.5rem;display:flex;align-items:center;gap:12px">
-        <svg width="30" height="30" viewBox="0 0 40 40" fill="none"><path d="M20 4 L34 16 V34 H24 V24 H16 V34 H6 V16 Z" stroke="#E7A64C" stroke-width="2.2" stroke-linejoin="round"/><rect x="17" y="12" width="6" height="6" fill="#E7A64C"/></svg>Загород
+        <svg width="30" height="30" viewBox="0 0 40 40" fill="none"><path d="M20 4 L34 16 V34 H24 V24 H16 V34 H6 V16 Z" stroke="#E7A64C" stroke-width="2.2" stroke-linejoin="round"/><rect x="17" y="12" width="6" height="6" fill="#E7A64C"/></svg>GreenPark
       </div>
-      <div style="max-width:280px">Аренда загородных домов посуточно. Работаем каждый день, отвечаем на звонки с 8:00 до 23:00.</div>
+      <div style="max-width:280px">Аренда домов посуточно в Сочи. Работаем каждый день, отвечаем на звонки с 8:00 до 23:00.</div>
     </div>
     <div class="fcol"><h4>Навигация</h4><div><a href="#houses">Дома</a></div><div><a href="#how">Как забронировать</a></div><div><a href="#reviews">Отзывы</a></div></div>
-    <div class="fcol"><h4>Контакты</h4><div><a href="tel:+70000000000">+7 000 000-00-00</a></div><div><a href="#">hello@zagorod.ru</a></div><div>Ежедневно 8:00–23:00</div></div>
-    <div class="fnote">© 2026 · Аренда загородных домов посуточно. Все дома проверены и застрахованы.</div>
+    <div class="fcol"><h4>Контакты</h4>
+      <div><a href="tel:+79000000000">+7 900 000-00-00</a></div>
+      <div><a class="f-tg" href="https://t.me/greenpark" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21.94 4.28 2.9 11.63c-1.03.4-1.02 1.86.02 2.24l4.64 1.68 1.8 5.55c.28.86 1.36 1.11 1.98.45l2.57-2.72 4.75 3.48c.66.48 1.6.12 1.78-.68l3.2-14.4c.2-.9-.68-1.66-1.7-1.27ZM9.7 15.1l-.28 3.9-1.2-3.98 9.4-6.1-7.92 6.18Z"/></svg>@greenpark</a></div>
+      <div><a href="mailto:hello@greenpark.ru">hello@greenpark.ru</a></div>
+      <div>Ежедневно 8:00–23:00</div>
+    </div>
+    <div class="fnote">© 2026 · GreenPark — аренда домов посуточно в Сочи. Все дома проверены и застрахованы.</div>
   </div>
 </footer>
 
-<!-- ===================== BOOKING MODAL ===================== -->
-<div class="modal" id="modal" aria-hidden="true">
-  <div class="modal-bg" onclick="closeModal()"></div>
-  <div class="modal-box" role="dialog" aria-modal="true" aria-label="Бронирование дома">
-    <div id="formView">
-      <div class="modal-top">
-        <button class="close" onclick="closeModal()" aria-label="Закрыть">✕</button>
-        <span class="eyebrow">Бронирование</span>
-        <h3>Забронировать дом</h3>
-        <div class="m-house" id="mHouse">Выберите дом ниже</div>
-      </div>
-      <div class="modal-form">
-        <div class="row">
-          <div class="grp" id="g-house">
-            <label>Дом</label>
-            <select id="f-house"></select>
-            <span class="err">Выберите дом</span>
-          </div>
-        </div>
-        <div class="row">
-          <div class="grp" id="g-in">
-            <label>Заезд</label>
-            <input type="date" id="f-in">
-            <span class="err">Укажите дату заезда</span>
-          </div>
-          <div class="grp" id="g-out">
-            <label>Выезд</label>
-            <input type="date" id="f-out">
-            <span class="err">Выезд должен быть позже заезда</span>
-          </div>
-        </div>
-        <div class="row">
-          <div class="grp" id="g-guests">
-            <label>Гостей</label>
-            <select id="f-guests">
-              <option value="1">1 гость</option><option value="2" selected>2 гостя</option>
-              <option value="3">3 гостя</option><option value="4">4 гостя</option>
-              <option value="5">5 гостей</option><option value="6">6 гостей</option>
-              <option value="8">8 гостей</option><option value="10">10 гостей</option>
-            </select>
-          </div>
-        </div>
-        <div class="row">
-          <div class="grp" id="g-name">
-            <label>Ваше имя</label>
-            <input type="text" id="f-name" placeholder="Как к вам обращаться">
-            <span class="err">Введите имя</span>
-          </div>
-          <div class="grp" id="g-phone">
-            <label>Телефон</label>
-            <input type="tel" id="f-phone" placeholder="+7 900 000-00-00">
-            <span class="err">Введите корректный телефон</span>
-          </div>
-        </div>
-
-        <!-- honeypot: настоящие пользователи это поле не видят и не заполняют -->
-        <div class="hp" aria-hidden="true">
-          <label for="f-company">Не заполняйте это поле</label>
-          <input type="text" id="f-company" name="company" tabindex="-1" autocomplete="off">
-        </div>
-
-        <div class="summary" id="summary">
-          <div class="line"><span>Выберите даты, чтобы рассчитать стоимость</span></div>
-        </div>
-
-        <div class="submit-err" id="submitErr"></div>
-        <button class="submit" id="submitBtn" onclick="submitBooking()">Отправить заявку</button>
-      </div>
-    </div>
-
-    <div class="success" id="successView" style="display:none">
-      <div class="ok"><svg viewBox="0 0 40 40" fill="none"><path d="M10 21 L17 28 L31 12" stroke="#E7A64C" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      <h3>Заявка принята!</h3>
-      <p id="successMsg">Мы свяжемся с вами в течение 15 минут для подтверждения.</p>
-      <div class="ref" id="refNum">№ ZG-000000</div><br>
-      <button class="again" onclick="resetModal()">Забронировать ещё</button>
-    </div>
-  </div>
-</div>
+<!-- Модалка бронирования подключается из /booking.js (разметка + логика), стили — /modal.css -->
 
 <script src="/scene.js"></script>
 <script src="/houses-data.js"></script>
+<script src="/booking.js"></script>
 <script>
 "use strict";
 const RM = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -599,7 +505,6 @@ const scene = window.scene;
 
 /* ---------- render houses ---------- */
 const grid = document.getElementById('houseGrid');
-const fHouse = document.getElementById('f-house');
 houses.forEach((h,i)=>{
   const card=document.createElement('div');
   const href = `/dom.html?id=${encodeURIComponent(h.id)}`;
@@ -643,10 +548,6 @@ houses.forEach((h,i)=>{
     </div>`;
   card.querySelector('.book-btn').addEventListener('click',()=>openModal(h.id));
   grid.appendChild(card);
-
-  const opt=document.createElement('option');
-  opt.value=h.id; opt.textContent=`${h.name} — ${fmt(h.price)} ₽/сутки`;
-  fHouse.appendChild(opt);
 });
 
 /* ---------- reveal on scroll ---------- */
@@ -698,149 +599,15 @@ function onScroll(){
 }
 window.addEventListener('scroll',()=>{ if(!ticking){ requestAnimationFrame(onScroll); ticking=true; }},{passive:true});
 
-/* ---------- dates defaults ---------- */
-function iso(d){ return d.toISOString().split('T')[0]; }
-const today=new Date(), tomorrow=new Date(Date.now()+864e5), dayAfter=new Date(Date.now()+2*864e5);
-['s-in','f-in'].forEach(id=>{ const el=document.getElementById(id); el.min=iso(today); });
-['s-out','f-out'].forEach(id=>{ const el=document.getElementById(id); el.min=iso(tomorrow); });
-
-/* ---------- booking modal ---------- */
-const modal=document.getElementById('modal');
-const mHouse=document.getElementById('mHouse');
-const elIn=document.getElementById('f-in'), elOut=document.getElementById('f-out');
-const summary=document.getElementById('summary');
-
-function openModal(id){
-  document.getElementById('formView').style.display='';
-  document.getElementById('successView').style.display='none';
-  // carry over hero search values if present
-  const si=document.getElementById('s-in').value, so=document.getElementById('s-out').value, sg=document.getElementById('s-guests').value;
-  if(!elIn.value) elIn.value= si || iso(tomorrow);
-  if(!elOut.value) elOut.value= so || iso(dayAfter);
-  if(sg) document.getElementById('f-guests').value=sg;
-  if(id){ fHouse.value=id; }
-  updateHouseLabel(); calcSummary();
-  modal.classList.add('open'); modal.setAttribute('aria-hidden','false');
-  document.body.style.overflow='hidden';
-}
-function closeModal(){ modal.classList.remove('open'); modal.setAttribute('aria-hidden','true'); document.body.style.overflow=''; }
-function resetModal(){
-  document.getElementById('f-name').value='';
-  document.getElementById('f-phone').value='';
-  document.getElementById('f-company').value='';
-  const errBox=document.getElementById('submitErr'); errBox.style.display='none';
-  openModal(fHouse.value);
-}
-document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeModal(); });
-
-function fromSearch(){ openModal(); document.querySelector('.modal-box').scrollTop=0; }
-
-function updateHouseLabel(){
-  const h=houses.find(x=>x.id===fHouse.value);
-  mHouse.textContent = h ? `${h.name} · ${fmt(h.price)} ₽ за сутки · до ${h.cap} гостей` : 'Выберите дом ниже';
-}
-fHouse.addEventListener('change',()=>{ updateHouseLabel(); calcSummary(); });
-
-elIn.addEventListener('change',()=>{
-  const d=new Date(elIn.value); d.setDate(d.getDate()+1);
-  elOut.min=iso(d);
-  if(new Date(elOut.value)<=new Date(elIn.value)) elOut.value=iso(d);
-  calcSummary();
-});
-elOut.addEventListener('change',calcSummary);
-
-function nights(){
-  const a=new Date(elIn.value), b=new Date(elOut.value);
-  if(isNaN(a)||isNaN(b)) return 0;
-  return Math.max(0, Math.round((b-a)/864e5));
-}
-function calcSummary(){
-  const h=houses.find(x=>x.id===fHouse.value), n=nights();
-  if(!h||n<1){ summary.innerHTML='<div class="line"><span>Выберите даты, чтобы рассчитать стоимость</span></div>'; return; }
-  const total=h.price*n;
-  summary.innerHTML=`
-    <div class="line"><span>${fmt(h.price)} ₽ × ${n} ${nWord(n)}</span><span>${fmt(total)} ₽</span></div>
-    <div class="line"><span>Уборка и бельё</span><span>включено</span></div>
-    <div class="total"><span>Итого</span><span>${fmt(total)} ₽</span></div>`;
-}
-function nWord(n){ const a=n%10,b=n%100; if(a===1&&b!==11)return'сутки'; if(a>=2&&a<=4&&(b<10||b>=20))return'суток'; return'суток'; }
-
-/* показать экран подтверждения */
-function showSuccess(h,n,total,name,ref){
-  document.getElementById('refNum').textContent='№ '+ref;
-  document.getElementById('successMsg').innerHTML=
-    `«${h.name}», ${n} ${nWord(n)}, итого <b>${fmt(total)} ₽</b>.<br>${name}, мы свяжемся с вами в течение 15 минут для подтверждения.`;
-  document.getElementById('formView').style.display='none';
-  document.getElementById('successView').style.display='';
-  document.querySelector('.modal-box').scrollTop=0;
-}
-
-async function submitBooking(){
-  let ok=true;
-  const setErr=(id,bad)=>{ document.getElementById(id).classList.toggle('invalid',bad); if(bad)ok=false; };
-  const name=document.getElementById('f-name').value.trim();
-  const phone=document.getElementById('f-phone').value.trim();
-  setErr('g-house', !fHouse.value);
-  setErr('g-in', !elIn.value);
-  setErr('g-out', !elOut.value || nights()<1);
-  setErr('g-name', name.length<2);
-  setErr('g-phone', phone.replace(/\D/g,'').length<10);
-  if(!ok) return;
-
-  const h=houses.find(x=>x.id===fHouse.value), n=nights(), total=h.price*n;
-  const guests=+document.getElementById('f-guests').value;
-  const hp=document.getElementById('f-company').value.trim();
-
-  const btn=document.getElementById('submitBtn');
-  const errBox=document.getElementById('submitErr');
-  errBox.style.display='none';
-
-  // honeypot заполнен — это бот. Тихо игнорируем: показываем «успех», на сервер не идём.
-  if(hp){ showSuccess(h,n,total,name,'ZG-000000'); return; }
-
-  const payload={
-    house:h.id, houseName:h.name,
-    checkIn:elIn.value, checkOut:elOut.value,
-    nights:n, guests, name, phone, total,
-    company:hp   // honeypot (пустой у людей) — сервер тоже проверит
-  };
-
-  const oldText=btn.textContent;
-  btn.disabled=true;
-  btn.textContent='Отправляем…';
-
-  try{
-    const res=await fetch('/api/booking',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify(payload)
-    });
-    const data=await res.json().catch(()=>({}));
-    if(!res.ok || !data.ok){
-      throw new Error(data.error || 'Не удалось отправить заявку. Попробуйте ещё раз.');
-    }
-    // номер брони берём из ответа сервера
-    showSuccess(h,n,total,name,data.ref);
-  }catch(e){
-    errBox.textContent = (e && e.message) ? e.message : 'Ошибка сети. Проверьте соединение и попробуйте снова.';
-    errBox.style.display='block';
-  }finally{
-    btn.disabled=false;
-    btn.textContent=oldText;
-  }
-}
-
-/* expose */
-window.openModal=openModal; window.closeModal=closeModal; window.resetModal=resetModal;
-window.fromSearch=fromSearch; window.submitBooking=submitBooking;
-
-/* ---------- авто-открытие брони по ?book=<id> (переход со страницы дома) ---------- */
+/* ---------- hero-поиск: минимальные даты (сама форма брони — в /booking.js) ---------- */
 (function(){
-  const id=new URLSearchParams(location.search).get('book');
-  if(!id) return;
-  const h=houses.find(x=>x.id===id && x.status==='active');
-  if(h) openModal(h.id);
+  const iso=d=>d.toISOString().split('T')[0];
+  const today=new Date(), tomorrow=new Date(Date.now()+864e5);
+  const sIn=document.getElementById('s-in'), sOut=document.getElementById('s-out');
+  if(sIn) sIn.min=iso(today);
+  if(sOut) sOut.min=iso(tomorrow);
 })();
+
 </script>
 </body>
 </html>

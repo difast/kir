@@ -1,0 +1,56 @@
+/* ================= Модальное окно бронирования (общее для всех страниц) =================
+   Компактная вёрстка: форма целиком помещается в экран без прокрутки.
+   Использует CSS-переменные страницы (--pine, --cream, --honey, …). */
+
+.modal{position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;padding:16px}
+.modal.open{display:flex}
+.modal-bg{position:absolute;inset:0;background:rgba(9,20,15,.66);backdrop-filter:blur(4px);animation:mfade .3s ease}
+@keyframes mfade{from{opacity:0}to{opacity:1}}
+.modal-box{position:relative;background:var(--cream);border-radius:22px;width:min(520px,100%);max-height:96vh;overflow:auto;box-shadow:var(--shadow);animation:mpop .4s cubic-bezier(.16,.8,.3,1)}
+@keyframes mpop{from{opacity:0;transform:translateY(24px) scale(.97)}to{opacity:1;transform:none}}
+
+.modal-top{position:relative;padding:18px 26px 14px;background:var(--pine);color:var(--on-dark)}
+.modal-top .eyebrow{color:var(--honey);font-size:.64rem}
+.modal-top h3{font-size:1.5rem;margin-top:4px}
+.modal-top .m-house{font-size:.88rem;color:var(--on-dark-mut);margin-top:3px}
+.close{position:absolute;top:14px;right:14px;width:34px;height:34px;border-radius:50%;background:rgba(236,228,211,.14);color:var(--on-dark);font-size:1.1rem;display:grid;place-items:center;transition:.3s}
+.close:hover{background:rgba(236,228,211,.28);transform:rotate(90deg)}
+
+.modal-form{padding:18px 26px 22px}
+.row{display:flex;gap:12px;margin-bottom:11px}
+.grp{flex:1;display:flex;flex-direction:column;min-width:0}
+.grp label{font-size:.64rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:4px}
+.grp .req{color:var(--clay)}
+.grp input,.grp select{
+  border:1px solid var(--line);background:#fff;padding:10px 12px;border-radius:10px;font-family:inherit;font-size:.96rem;font-weight:500;color:var(--text);outline:none;transition:.25s;width:100%
+}
+.grp input:focus,.grp select:focus{border-color:var(--amber);box-shadow:0 0 0 3px rgba(231,166,76,.16)}
+.err{color:var(--clay);font-size:.74rem;margin-top:4px;display:none}
+.grp.invalid input,.grp.invalid select{border-color:var(--clay)}
+.grp.invalid .err{display:block}
+
+.summary{background:var(--birch);border-radius:12px;padding:12px 14px;margin:4px 0 14px;font-size:.9rem}
+.summary .line{display:flex;justify-content:space-between;padding:3px 0;color:var(--muted)}
+.summary .total{display:flex;justify-content:space-between;padding-top:9px;margin-top:6px;border-top:1px solid var(--line);font-weight:700;color:var(--text);font-size:1.08rem}
+
+.submit{width:100%;background:var(--pine);color:var(--on-dark);padding:14px;border-radius:12px;font-weight:700;font-size:1rem;transition:.35s}
+.submit:hover{background:var(--amber);color:var(--ink)}
+.submit:disabled{opacity:.7;cursor:default;background:var(--pine);color:var(--on-dark);transform:none}
+.submit-err{color:var(--clay);font-size:.88rem;font-weight:600;text-align:center;margin-bottom:12px;display:none}
+
+/* honeypot — скрыт от людей, ловит ботов */
+.hp{position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden}
+
+.success{padding:34px 28px;text-align:center;animation:mfade .5s ease}
+.success .ok{width:66px;height:66px;border-radius:50%;background:var(--pine);margin:0 auto 18px;display:grid;place-items:center}
+.success .ok svg{width:34px;height:34px}
+.success h3{font-size:2rem}
+.success p{color:var(--muted);margin:8px 0 16px}
+.success .ref{display:inline-block;background:var(--birch);padding:11px 20px;border-radius:12px;font-weight:700;letter-spacing:.05em;margin-bottom:22px}
+.success .again{background:var(--pine);color:var(--on-dark);padding:12px 26px;border-radius:100px;font-weight:700;transition:.35s}
+.success .again:hover{background:var(--amber);color:var(--ink)}
+
+@media(max-width:560px){
+  .row{flex-direction:column;gap:11px}
+  .grp input,.grp select{font-size:16px}  /* без авто-зума в iOS */
+}

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Дом — загород посуточно</title>
+<title>Дом — GreenPark</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Manrope:wght@300;400;500;600;700&display=swap&subset=cyrillic,latin" rel="stylesheet">
@@ -29,8 +29,17 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 .nav .wrap{display:flex;align-items:center;justify-content:space-between;padding:16px 0;gap:20px}
 .brand{display:flex;align-items:center;gap:12px;font-family:'Cormorant',serif;font-size:1.4rem}
 .brand .mk{width:30px;height:30px;flex:none}
-.nav-cta{background:var(--honey);color:var(--ink);padding:11px 22px;border-radius:100px;font-weight:700;font-size:.85rem;transition:.35s}
+.nav-cta{background:var(--honey);color:var(--ink);padding:11px 22px;border-radius:100px;font-weight:700;font-size:.85rem;transition:.35s;border:none}
 .nav-cta:hover{background:var(--on-dark)}
+.nav-actions{display:flex;align-items:center;gap:14px}
+.nav-phone{font-size:.9rem;font-weight:700;white-space:nowrap;transition:opacity .3s}
+.nav-phone:hover{opacity:.7}
+.tg-ic{width:36px;height:36px;border-radius:50%;border:1px solid rgba(236,228,211,.4);display:grid;place-items:center;transition:.35s;flex:none}
+.tg-ic svg{width:18px;height:18px}
+.tg-ic svg path{fill:var(--on-dark);transition:fill .35s}
+.tg-ic:hover{background:var(--honey);border-color:var(--honey)}
+.tg-ic:hover svg path{fill:var(--ink)}
+@media(max-width:520px){.nav-phone{display:none}}
 
 /* hero */
 .d-hero{position:relative;background:var(--pine);color:var(--on-dark);overflow:hidden}
@@ -89,7 +98,17 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 .aside .addr{margin-top:20px;padding-top:18px;border-top:1px solid var(--line);font-size:.86rem;color:var(--muted)}
 .aside .addr b{display:block;color:var(--text);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px;font-weight:700}
 
-footer{background:var(--ink);color:var(--on-dark-mut);padding:40px 0;font-size:.86rem;text-align:center;margin-top:40px}
+/* подвал — одинаковый с главной */
+footer{background:var(--ink);color:var(--on-dark-mut);padding:60px 0 40px;font-size:.9rem;margin-top:40px}
+footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:30px}
+footer .brand{color:var(--on-dark);margin-bottom:14px}
+footer a{transition:color .3s}
+footer a:hover{color:var(--honey)}
+.fcol h4{color:var(--on-dark);font-size:.78rem;letter-spacing:.2em;text-transform:uppercase;margin-bottom:14px;font-family:'Manrope'}
+.fcol div{margin-bottom:8px}
+.fnote{width:100%;border-top:1px solid rgba(236,228,211,.12);margin-top:36px;padding-top:24px;font-size:.8rem}
+.f-tg{display:inline-flex;align-items:center;gap:7px}
+.f-tg svg{width:15px;height:15px;fill:currentColor}
 .notfound{padding:100px 0;text-align:center}
 .notfound h1{font-size:2.6rem;margin-bottom:14px}
 .notfound a{color:var(--amber);font-weight:700}
@@ -105,22 +124,45 @@ footer{background:var(--ink);color:var(--on-dark-mut);padding:40px 0;font-size:.
   .facts{grid-template-columns:1fr}
 }
 </style>
+<link rel="stylesheet" href="/modal.css">
 </head>
 <body>
 
 <nav class="nav">
   <div class="wrap">
-    <a class="brand" href="/"><svg class="mk" viewBox="0 0 40 40" fill="none"><path d="M20 4 L34 16 V34 H24 V24 H16 V34 H6 V16 Z" stroke="#E7A64C" stroke-width="2.2" stroke-linejoin="round"/><rect x="17" y="12" width="6" height="6" fill="#E7A64C"/></svg>Загород</a>
-    <a class="nav-cta" id="navBook" href="/#houses">Забронировать</a>
+    <a class="brand" href="/"><svg class="mk" viewBox="0 0 40 40" fill="none"><path d="M20 4 L34 16 V34 H24 V24 H16 V34 H6 V16 Z" stroke="#E7A64C" stroke-width="2.2" stroke-linejoin="round"/><rect x="17" y="12" width="6" height="6" fill="#E7A64C"/></svg>GreenPark</a>
+    <div class="nav-actions">
+      <a class="nav-phone" href="tel:+79000000000">+7 900 000-00-00</a>
+      <a class="tg-ic" href="https://t.me/greenpark" target="_blank" rel="noopener" aria-label="Telegram"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21.94 4.28 2.9 11.63c-1.03.4-1.02 1.86.02 2.24l4.64 1.68 1.8 5.55c.28.86 1.36 1.11 1.98.45l2.57-2.72 4.75 3.48c.66.48 1.6.12 1.78-.68l3.2-14.4c.2-.9-.68-1.66-1.7-1.27ZM9.7 15.1l-.28 3.9-1.2-3.98 9.4-6.1-7.92 6.18Z"/></svg></a>
+      <button class="nav-cta" id="navBook">Забронировать</button>
+    </div>
   </div>
 </nav>
 
 <main id="app"></main>
 
-<footer>© 2026 · Аренда загородных домов посуточно</footer>
+<footer>
+  <div class="wrap">
+    <div class="fcol">
+      <div class="brand" style="font-family:'Cormorant',serif;font-size:1.5rem;display:flex;align-items:center;gap:12px">
+        <svg width="30" height="30" viewBox="0 0 40 40" fill="none"><path d="M20 4 L34 16 V34 H24 V24 H16 V34 H6 V16 Z" stroke="#E7A64C" stroke-width="2.2" stroke-linejoin="round"/><rect x="17" y="12" width="6" height="6" fill="#E7A64C"/></svg>GreenPark
+      </div>
+      <div style="max-width:280px">Аренда домов посуточно в Сочи. Работаем каждый день, отвечаем на звонки с 8:00 до 23:00.</div>
+    </div>
+    <div class="fcol"><h4>Навигация</h4><div><a href="/#houses">Дома</a></div><div><a href="/#how">Как забронировать</a></div><div><a href="/#reviews">Отзывы</a></div></div>
+    <div class="fcol"><h4>Контакты</h4>
+      <div><a href="tel:+79000000000">+7 900 000-00-00</a></div>
+      <div><a class="f-tg" href="https://t.me/greenpark" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21.94 4.28 2.9 11.63c-1.03.4-1.02 1.86.02 2.24l4.64 1.68 1.8 5.55c.28.86 1.36 1.11 1.98.45l2.57-2.72 4.75 3.48c.66.48 1.6.12 1.78-.68l3.2-14.4c.2-.9-.68-1.66-1.7-1.27ZM9.7 15.1l-.28 3.9-1.2-3.98 9.4-6.1-7.92 6.18Z"/></svg>@greenpark</a></div>
+      <div><a href="mailto:hello@greenpark.ru">hello@greenpark.ru</a></div>
+      <div>Ежедневно 8:00–23:00</div>
+    </div>
+    <div class="fnote">© 2026 · GreenPark — аренда домов посуточно в Сочи. Все дома проверены и застрахованы.</div>
+  </div>
+</footer>
 
 <script src="/scene.js"></script>
 <script src="/houses-data.js"></script>
+<script src="/booking.js"></script>
 <script>
 "use strict";
 const fmt = n => n.toLocaleString('ru-RU');
@@ -133,7 +175,7 @@ const esc = s => String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'
 if(!h){
   app.innerHTML = `<div class="wrap notfound"><h1>Дом не найден</h1><p>Возможно, объявление снято. <a href="/#houses">Вернуться к каталогу →</a></p></div>`;
 } else {
-  document.title = `${h.name} — загород посуточно`;
+  document.title = `${h.name} — GreenPark`;
   const isRemont = h.status === 'renovation';
 
   // чипы в шапке
@@ -184,7 +226,7 @@ if(!h){
     : `<div class="aside">
          <div class="price">${h.priceFrom?'<span class="from">от</span>':''}${fmt(h.price)} ₽ <small>/ сутки</small></div>
          <div class="cap">${h.cap ? 'До '+h.cap+' гостей' : ''}</div>
-         <a class="big-btn" href="/?book=${encodeURIComponent(h.id)}">Забронировать</a>
+         <button class="big-btn" onclick="Booking.open('${h.id}')">Забронировать</button>
          ${h.avito ? `<a class="avito" href="${esc(h.avito)}" target="_blank" rel="noopener">Смотреть на Авито ↗</a>` : ''}
          ${h.address ? `<div class="addr"><b>Расположение</b>${esc(h.address)}</div>` : ''}
        </div>`;
@@ -217,8 +259,8 @@ if(!h){
     </section>`;
 
   const navBook = document.getElementById('navBook');
-  if(isRemont){ navBook.textContent='К каталогу'; navBook.href='/#houses'; }
-  else { navBook.href = `/?book=${encodeURIComponent(h.id)}`; }
+  if(isRemont){ navBook.textContent='К каталогу'; navBook.onclick=()=>{ location.href='/#houses'; }; }
+  else { navBook.onclick=()=>window.Booking.open(h.id); }
 }
 </script>
 </body>
