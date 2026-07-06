@@ -169,7 +169,7 @@ section{position:relative}
 .pad{padding:120px 0}
 
 /* скруглённые «слоёные» блоки после hero */
-.stats,.houses,.how,.reviews,.cta,footer{
+.stats,.houses,.how,.reviews,.faq,.cta,footer{
   border-radius:44px 44px 0 0;
   margin-top:-44px;
   position:relative;
@@ -247,6 +247,18 @@ section{position:relative}
 .rev .av{width:44px;height:44px;border-radius:50%;background:var(--pine);color:var(--honey);display:grid;place-items:center;font-weight:700;font-family:'Cormorant',serif;font-size:1.3rem}
 .rev .who b{font-size:.94rem}
 .rev .who span{display:block;font-size:.78rem;color:var(--muted)}
+
+/* faq */
+.faq{background:var(--cream)}
+.faq-list{max-width:820px;margin-inline:auto}
+.faq-item{border-bottom:1px solid var(--line)}
+.faq-item summary{list-style:none;cursor:pointer;padding:22px 46px 22px 0;position:relative;font-family:'Cormorant',serif;font-size:clamp(1.3rem,2.6vw,1.6rem);color:var(--text);transition:color .3s}
+.faq-item summary::-webkit-details-marker{display:none}
+.faq-item summary::after{content:"+";position:absolute;right:4px;top:22px;font-size:1.5rem;line-height:1.4;color:var(--amber);transition:transform .3s;font-family:'Manrope',sans-serif}
+.faq-item[open] summary::after{content:"–"}
+.faq-item summary:hover{color:var(--amber)}
+.faq-item .ans{padding:0 46px 22px 0;color:var(--muted);font-size:1.02rem;max-width:700px;animation:faqIn .35s ease}
+@keyframes faqIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
 
 /* cta */
 .cta{background:linear-gradient(140deg,var(--pine) 0%,var(--pine-2) 100%);color:var(--on-dark);text-align:center;overflow:hidden}
@@ -364,6 +376,7 @@ footer a:hover{color:var(--honey)}
       <a href="#houses">Дома</a>
       <a href="#how">Как забронировать</a>
       <a href="#reviews">Отзывы</a>
+      <a href="#faq">Вопросы</a>
     </div>
     <div class="nav-actions">
       <a class="nav-phone" href="tel:+79182030181">+7 918 203 01 81</a>
@@ -415,8 +428,8 @@ footer a:hover{color:var(--honey)}
     </div>
     <div class="stats-grid">
       <div class="stat reveal d1"><div class="num" data-count="4.9" data-dec="1">0</div><div class="lbl">средний рейтинг гостей</div></div>
-      <div class="stat reveal d2"><div class="num" data-count="5" data-suf=" мин">0</div><div class="lbl">на заселение по онлайн-ключу</div></div>
-      <div class="stat reveal d3"><div class="num" data-count="14000" data-suf="+">0</div><div class="lbl">ночей провели наши гости</div></div>
+      <div class="stat reveal d2"><div class="num" data-count="7" data-suf=" мин">0</div><div class="lbl">до моря на автомобиле</div></div>
+      <div class="stat reveal d3"><div class="num" data-count="5" data-suf=" мин">0</div><div class="lbl">на заселение по онлайн-ключу</div></div>
     </div>
   </div>
 </section>
@@ -463,6 +476,25 @@ footer a:hover{color:var(--honey)}
   </div>
 </section>
 
+<!-- ===================== FAQ ===================== -->
+<section class="faq pad" id="faq">
+  <div class="wrap">
+    <div class="head reveal">
+      <span class="eyebrow">Вопросы и ответы</span>
+      <h2>Частые вопросы</h2>
+    </div>
+    <div class="faq-list reveal d1">
+      <details class="faq-item"><summary>Как происходит заселение?</summary><div class="ans">Бесконтактно: в день заезда пришлём код от умного замка. Никаких встреч, ожиданий и залогов наличными.</div></details>
+      <details class="faq-item"><summary>Во сколько заезд и выезд?</summary><div class="ans">Заезд с 15:00, выезд до 12:00–13:00 в зависимости от дома. Точное время — в подтверждении брони.</div></details>
+      <details class="faq-item"><summary>Нужен ли залог?</summary><div class="ans">Да, возвращаемый залог: 5 000 ₽ за дом 35 м² и 15 000 ₽ за дом 100 м². Возвращаем при выезде, если всё в порядке.</div></details>
+      <details class="faq-item"><summary>Что входит: бассейн, парковка, Wi-Fi?</summary><div class="ans">Да: летний бассейн, зона барбекю, бесплатная парковка на территории, Wi-Fi, постельное бельё и полотенца.</div></details>
+      <details class="faq-item"><summary>Можно ли с детьми и питомцами?</summary><div class="ans">С детьми — да, есть детская кроватка и стульчик (по запросу — ванночка). К сожалению, с питомцами нельзя.</div></details>
+      <details class="faq-item"><summary>Можно ли курить и устраивать вечеринки?</summary><div class="ans">Курить в доме нельзя, шумные вечеринки запрещены. Шуметь на участке можно до 21:00–22:00.</div></details>
+      <details class="faq-item"><summary>Как оплатить и подтвердить бронь?</summary><div class="ans">Оставьте заявку — свяжемся в течение 15 минут, подтвердим свободные даты и закрепим дом. Оплата после подтверждения.</div></details>
+    </div>
+  </div>
+</section>
+
 <!-- ===================== CTA ===================== -->
 <section class="cta pad">
   <div class="wrap reveal">
@@ -482,7 +514,7 @@ footer a:hover{color:var(--honey)}
       </div>
       <div style="max-width:280px">Аренда домов посуточно в Сочи. Работаем каждый день, отвечаем на звонки с 8:00 до 20:00.</div>
     </div>
-    <div class="fcol"><h4>Навигация</h4><div><a href="#houses">Дома</a></div><div><a href="#how">Как забронировать</a></div><div><a href="#reviews">Отзывы</a></div></div>
+    <div class="fcol"><h4>Навигация</h4><div><a href="#houses">Дома</a></div><div><a href="#how">Как забронировать</a></div><div><a href="#reviews">Отзывы</a></div><div><a href="#faq">Вопросы</a></div></div>
     <div class="fcol"><h4>Контакты</h4>
       <div><a href="tel:+79182030181">+7 918 203 01 81</a></div>
       <div><a class="f-tg" href="https://t.me/+79182030181" target="_blank" rel="noopener" aria-label="Telegram"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.78 18.65l.28-4.23 7.68-6.92c.34-.31-.07-.46-.52-.19L7.74 13.3 3.64 12c-.88-.25-.89-.86.2-1.3l15.97-6.16c.73-.33 1.43.18 1.15 1.3l-2.72 12.81c-.19.91-.74 1.13-1.5.71L12.6 16.3l-1.99 1.93c-.23.23-.42.42-.83.42z"/></svg></a></div>
@@ -553,6 +585,19 @@ houses.forEach((h,i)=>{
   card.querySelector('.book-btn').addEventListener('click',()=>openModal(h.id));
   grid.appendChild(card);
 });
+
+/* ---------- лёгкий hover-tilt на карточках (наклон ~2–3°) ---------- */
+if(!RM){
+  document.querySelectorAll('.card:not(.is-remont)').forEach(card=>{
+    card.addEventListener('mouseenter',()=>{ card.style.transition='transform .12s ease-out'; });
+    card.addEventListener('mousemove',e=>{
+      const r=card.getBoundingClientRect();
+      const px=(e.clientX-r.left)/r.width-.5, py=(e.clientY-r.top)/r.height-.5;
+      card.style.transform=`perspective(900px) rotateY(${(px*5).toFixed(2)}deg) rotateX(${(-py*5).toFixed(2)}deg) translateY(-8px)`;
+    });
+    card.addEventListener('mouseleave',()=>{ card.style.transition=''; card.style.transform=''; });
+  });
+}
 
 /* ---------- reveal on scroll ---------- */
 const io=new IntersectionObserver((es)=>{

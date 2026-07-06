@@ -60,7 +60,7 @@
             </div>
             <div class="grp" id="g-phone">
               <label>Телефон <span class="req">*</span></label>
-              <input type="tel" id="f-phone" placeholder="+7 900 000-00-00" required>
+              <input type="tel" id="f-phone" placeholder="+7 (___) ___-__-__" inputmode="tel" required>
               <span class="err">Введите корректный телефон</span>
             </div>
           </div>
@@ -106,6 +106,26 @@
   });
 
   elIn.min = iso(today); elOut.min = iso(tomorrow);
+
+  // ---------- маска телефона +7 (___) ___-__-__ ----------
+  const phoneEl = document.getElementById('f-phone');
+  function maskPhone(v) {
+    let d = v.replace(/\D/g, '');
+    if (d.startsWith('8')) d = '7' + d.slice(1);   // 8… → 7…
+    if (!d.startsWith('7')) d = '7' + d;            // 9…, любой ввод → префикс 7
+    d = d.slice(0, 11);                             // 7 + 10 цифр
+    const r = d.slice(1);
+    let out = '+7';
+    if (r.length) out += ' (' + r.slice(0, 3);
+    if (r.length >= 3) out += ')';
+    if (r.length > 3) out += ' ' + r.slice(3, 6);
+    if (r.length >= 6) out += '-' + r.slice(6, 8);
+    if (r.length >= 8) out += '-' + r.slice(8, 10);
+    return out;
+  }
+  phoneEl.addEventListener('input', () => { phoneEl.value = maskPhone(phoneEl.value); });
+  phoneEl.addEventListener('focus', () => { if (!phoneEl.value) phoneEl.value = '+7 ('; });
+  phoneEl.addEventListener('blur', () => { if (phoneEl.value === '+7 (' || phoneEl.value === '+7') phoneEl.value = ''; });
 
   // ---------- расчёты ----------
   function nights() {

@@ -16,6 +16,7 @@ window.__HOUSES__ = [
     status: 'active',
     avito: 'https://www.avito.ru/sochi/doma_dachi_kottedzhi/3-k._dom_100_m_7982200683',
     address: 'Краснодарский край, г.о. Сочи, с. Верхневесёлое, Ворошиловградская ул., 244/2 (Адлерский р-н)',
+    map: 'https://yandex.ru/map-widget/v1/?um=constructor%3A5f7d7ba28c819732eef3050cffd02b91e80e38c1b46c227f9877999bb2f4e1e3&source=constructor',
     tags: ['Бассейн 10×5', 'Барбекю', 'Wi-Fi', 'Тёплый пол'],
     short: 'Тёплый дом на 6 гостей с летним бассейном 10×5 м, террасой и зоной барбекю. До моря 7 минут, рядом Олимпийский парк.',
     description: [
@@ -68,6 +69,7 @@ window.__HOUSES__ = [
     status: 'active',
     avito: 'https://www.avito.ru/sochi/doma_dachi_kottedzhi/2-k._dom_35_m_8032623530',
     address: 'Краснодарский край, г.о. Сочи, с. Верхневесёлое, Ворошиловградская ул., 244/2 (Адлерский р-н)',
+    map: 'https://yandex.ru/map-widget/v1/?um=constructor%3A5f7d7ba28c819732eef3050cffd02b91e80e38c1b46c227f9877999bb2f4e1e3&source=constructor',
     tags: ['Новый 2025', 'Бассейн', 'Мангал', 'Wi-Fi'],
     short: 'Новый дом 2025 года на 4 гостей: спальня с двуспальной кроватью, диван-кровать в гостиной, открытый бассейн и мангал. Пляж — в 8 минутах.',
     description: [
@@ -120,6 +122,7 @@ window.__HOUSES__ = [
     status: 'renovation',
     avito: '',
     address: 'Краснодарский край, г.о. Сочи, с. Верхневесёлое, Ворошиловградская ул., 244/2 (Адлерский р-н)',
+    map: 'https://yandex.ru/map-widget/v1/?um=constructor%3A5f7d7ba28c819732eef3050cffd02b91e80e38c1b46c227f9877999bb2f4e1e3&source=constructor',
     tags: [],
     short: 'Третий домик на той же зелёной территории у бассейна.',
     description: [
