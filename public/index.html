@@ -194,6 +194,25 @@ section{position:relative}
 .card .cap{font-size:.86rem;color:var(--muted)}
 .book-btn{background:var(--pine);color:var(--on-dark);padding:12px 22px;border-radius:100px;font-weight:700;font-size:.86rem;transition:.35s;white-space:nowrap}
 .book-btn:hover{background:var(--amber);color:var(--ink)}
+.card-foot .actions{display:flex;align-items:center;gap:14px}
+.more-link{font-size:.86rem;font-weight:700;color:var(--amber);white-space:nowrap;transition:color .3s}
+.more-link:hover{color:var(--clay)}
+.card .scene-link{display:block}
+/* карточка дома на ремонте — красивая «заглушка» */
+.card.is-remont{opacity:.96}
+.card.is-remont .scene svg{filter:grayscale(.55) brightness(.82)}
+.card.is-remont:hover{transform:none;box-shadow:0 20px 50px -34px rgba(12,29,22,.55)}
+.card.is-remont:hover .scene svg{transform:none}
+.remont-badge{position:absolute;top:14px;left:14px;z-index:2;background:var(--clay);color:#fff;
+  padding:8px 15px;border-radius:100px;font-size:.78rem;font-weight:700;letter-spacing:.02em;
+  display:flex;align-items:center;gap:7px;box-shadow:0 8px 20px -8px rgba(168,72,31,.7)}
+.remont-badge::before{content:"";width:8px;height:8px;border-radius:50%;background:#fff;animation:remontPulse 1.8s ease-in-out infinite}
+@keyframes remontPulse{0%,100%{opacity:.4}50%{opacity:1}}
+.remont-overlay{position:absolute;inset:0;z-index:1;display:grid;place-items:center;
+  background:linear-gradient(180deg,rgba(12,29,22,.12) 0%,rgba(12,29,22,.5) 100%)}
+.remont-overlay span{background:rgba(12,29,22,.74);color:var(--on-dark);padding:9px 18px;border-radius:100px;
+  font-weight:600;font-size:.86rem;letter-spacing:.02em;backdrop-filter:blur(4px)}
+.book-btn.disabled{background:var(--birch);color:var(--muted);cursor:default;pointer-events:none}
 
 /* how it works */
 .how{background:var(--ink);color:var(--on-dark)}
@@ -567,80 +586,59 @@ footer a:hover{color:var(--honey)}
   </div>
 </div>
 
+<script src="/scene.js"></script>
+<script src="/houses-data.js"></script>
 <script>
 "use strict";
 const RM = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const fmt = n => n.toLocaleString('ru-RU');
 
-/* ---------- house data + SVG scenes ---------- */
-const houses = [
-  {id:'les',   name:'Лесная опушка', loc:'Хвойный лес · 40 км от города', price:8500,  cap:6,  tags:['Баня','Камин','Барбекю','Wi-Fi'], type:'forest'},
-  {id:'ozero', name:'У озера',       loc:'Берег озера · 55 км от города',  price:12000, cap:8,  tags:['Баня','Причал','Лодка','Барбекю'], type:'lake'},
-  {id:'gora',  name:'Горный склон',  loc:'Предгорье · 70 км от города',    price:9500,  cap:4,  tags:['Джакузи','Панорама','Камин'],       type:'mountain'},
-  {id:'zima',  name:'Зимняя усадьба',loc:'Сосновый бор · 48 км',           price:15000, cap:10, tags:['Две бани','Бильярд','Камин','Wi-Fi'],type:'winter'},
-  {id:'bor',   name:'Сосновый бор',  loc:'Опушка · 35 км от города',       price:7000,  cap:5,  tags:['Терраса','Барбекю','Wi-Fi'],        type:'pines'},
-  {id:'zavod', name:'Тихая заводь',  loc:'Тихая река · 60 км',             price:10500, cap:6,  tags:['Баня','Причал','Камин'],            type:'water'},
-];
-
-function scene(type){
-  const skies = {
-    forest:['#BFD9C6','#7FB08C'], lake:['#CDE4E8','#8FC0C6'],
-    mountain:['#D8DCE6','#A7B0C4'], winter:['#E4EAEF','#BFD0DA'],
-    pines:['#D6E3C7','#9BBE86'], water:['#C9E0DC','#8AB7B0'],
-  };
-  const [s1,s2]=skies[type];
-  let mid='', fg='';
-  const tree=(x,y,s,c)=>`<path d="M${x} ${y} l${8*s} ${20*s} h${-16*s} Z M${x} ${y+10*s} l${11*s} ${22*s} h${-22*s} Z M${x} ${y+22*s} l${13*s} ${24*s} h${-26*s} Z" fill="${c}"/><rect x="${x-2*s}" y="${y+44*s}" width="${4*s}" height="${8*s}" fill="#5a3d24"/>`;
-
-  if(type==='mountain'){
-    mid=`<path d="M0 200 L120 90 210 150 330 60 440 160 560 200 Z" fill="#8793A8"/><path d="M120 90 L150 112 100 130Z" fill="#eef1f5"/><path d="M330 60 L360 84 300 100Z" fill="#eef1f5"/>`;
-    fg=`<path d="M0 220 H560 V180 Q280 150 0 180 Z" fill="#3f6f52"/>`+tree(90,150,1.3,'#2f5a41')+tree(470,155,1.4,'#2f5a41');
-  } else if(type==='lake' || type==='water'){
-    mid=tree(70,70,1.3,'#2f6a4e')+tree(150,80,1,'#357a58')+tree(430,72,1.4,'#2f6a4e')+tree(500,86,1,'#357a58');
-    fg=`<rect x="0" y="176" width="560" height="64" fill="#6aa6ab"/><rect x="0" y="176" width="560" height="64" fill="url(#rip${type})" opacity=".5"/><path d="M0 176 Q280 158 560 176 V180 H0Z" fill="#4d8a86"/>`;
-  } else if(type==='winter'){
-    mid=tree(80,66,1.5,'#2c5142')+tree(180,80,1.1,'#356149')+tree(390,68,1.5,'#2c5142')+tree(480,82,1.2,'#356149');
-    fg=`<path d="M0 240 V180 Q280 150 560 180 V240Z" fill="#f2f6fa"/><path d="M0 190 Q280 168 560 190" stroke="#dbe6ee" stroke-width="3" fill="none"/>`;
-    // snow dots on top of trees rendered via foreground white already
-  } else { // forest / pines
-    mid=tree(60,70,1.4,'#2f6248')+tree(150,82,1,'#38714f')+tree(240,74,1.3,'#2f6248')+tree(360,80,1.1,'#38714f')+tree(460,70,1.4,'#2f6248');
-    fg=`<path d="M0 240 V182 Q280 160 560 182 V240Z" fill="#3c6b4f"/>`+tree(110,150,1.1,'#28503a')+tree(420,152,1.2,'#28503a');
-  }
-
-  return `<svg viewBox="0 0 560 240" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-    <defs>
-      <linearGradient id="sky${type}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${s1}"/><stop offset="1" stop-color="${s2}"/></linearGradient>
-      <linearGradient id="rip${type}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".5"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
-    </defs>
-    <rect width="560" height="240" fill="url(#sky${type})"/>
-    <circle cx="470" cy="52" r="30" fill="#FBE7B8" opacity=".85"/>
-    ${mid}${fg}
-    <!-- cabin -->
-    <g transform="translate(238,130)">
-      <path d="M42 0 L84 34 V78 H0 V34 Z" fill="#6b4a2c"/>
-      <path d="M42 0 L84 34 H0 Z" fill="#4f351f"/>
-      <rect x="14" y="46" width="18" height="18" fill="#FBD98A"/>
-      <rect x="52" y="46" width="18" height="18" fill="#FBD98A"/>
-      <rect x="34" y="52" width="16" height="26" fill="#3a2716"/>
-    </g>
-  </svg>`;
-}
+/* ---------- house data (общий источник — houses-data.js) ---------- */
+const houses = window.__HOUSES__;
+const scene = window.scene;
 
 /* ---------- render houses ---------- */
 const grid = document.getElementById('houseGrid');
 const fHouse = document.getElementById('f-house');
 houses.forEach((h,i)=>{
   const card=document.createElement('div');
+  const href = `/dom.html?id=${encodeURIComponent(h.id)}`;
+
+  if(h.status==='renovation'){
+    // Красивая заглушка: дом на ремонте, брони нет
+    card.className='card is-remont reveal d'+((i%3)+1);
+    card.innerHTML=`
+      <div class="scene">
+        <span class="remont-badge">На ремонте</span>
+        ${scene(h.type)}
+        <div class="remont-overlay"><span>Скоро откроется после ремонта</span></div>
+      </div>
+      <div class="card-body">
+        <h3>${h.name}</h3>
+        <div class="loc">${h.loc}</div>
+        <div class="tags"><span class="tag">Готовим к сезону</span></div>
+        <div class="card-foot">
+          <span class="cap">Временно недоступен</span>
+          <button class="book-btn disabled" disabled>На ремонте</button>
+        </div>
+      </div>`;
+    grid.appendChild(card);
+    return; // в выпадающий список брони не добавляем
+  }
+
   card.className='card reveal d'+((i%3)+1);
   card.innerHTML=`
-    <div class="scene">${scene(h.type)}<div class="price-tag">${fmt(h.price)} ₽<small>/сутки</small></div></div>
+    <a class="scene-link" href="${href}"><div class="scene">${scene(h.type)}<div class="price-tag">${fmt(h.price)} ₽<small>/сутки</small></div></div></a>
     <div class="card-body">
-      <h3>${h.name}</h3>
+      <h3><a href="${href}">${h.name}</a></h3>
       <div class="loc">${h.loc}</div>
       <div class="tags">${h.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>
       <div class="card-foot">
         <span class="cap">до ${h.cap} гостей</span>
-        <button class="book-btn" data-id="${h.id}">Забронировать</button>
+        <div class="actions">
+          <a class="more-link" href="${href}">Подробнее →</a>
+          <button class="book-btn" data-id="${h.id}">Забронировать</button>
+        </div>
       </div>
     </div>`;
   card.querySelector('.book-btn').addEventListener('click',()=>openModal(h.id));
@@ -835,6 +833,14 @@ async function submitBooking(){
 /* expose */
 window.openModal=openModal; window.closeModal=closeModal; window.resetModal=resetModal;
 window.fromSearch=fromSearch; window.submitBooking=submitBooking;
+
+/* ---------- авто-открытие брони по ?book=<id> (переход со страницы дома) ---------- */
+(function(){
+  const id=new URLSearchParams(location.search).get('book');
+  if(!id) return;
+  const h=houses.find(x=>x.id===id && x.status==='active');
+  if(h) openModal(h.id);
+})();
 </script>
 </body>
 </html>

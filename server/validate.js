@@ -24,6 +24,9 @@ function validateBooking(body) {
   if (!house) {
     return { ok: false, error: 'Выбранный дом не найден' };
   }
+  if (house.status === 'renovation') {
+    return { ok: false, error: 'Этот дом сейчас на ремонте и недоступен для брони' };
+  }
 
   const name = String(body.name || '').trim();
   if (name.length < 2) {
