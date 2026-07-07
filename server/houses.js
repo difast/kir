@@ -13,14 +13,21 @@
 const HOUSES = [
   {
     id: 'dom100',
-    name: 'Семейный дом с бассейном',
+    name: 'Семейный дом на 6 человек',
     price: 10000,
     cap: 6,
     status: 'active',
   },
   {
     id: 'dom35',
-    name: 'Новый дом у Олимпийского парка',
+    name: 'Семейный дом на 4 человека',
+    price: 3500,
+    cap: 4,
+    status: 'active',
+  },
+  {
+    id: 'dom35b',
+    name: 'Семейный дом на 4 человека',
     price: 3500,
     cap: 4,
     status: 'active',
