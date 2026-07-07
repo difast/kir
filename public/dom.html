@@ -110,6 +110,20 @@ footer a:hover{color:var(--honey)}
 .fnote{width:100%;border-top:1px solid rgba(236,228,211,.12);margin-top:36px;padding-top:24px;font-size:.8rem}
 .f-tg{display:inline-flex;align-items:center;gap:7px}
 .f-tg svg{width:15px;height:15px;fill:currentColor}
+/* галерея-карусель */
+.d-gallery{padding:34px 0 0}
+.gallery{position:relative;border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);background:#0c1d16}
+.gal-stage{position:relative;width:100%;aspect-ratio:3/2}
+.gal-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .7s ease}
+.gal-img.is-on{opacity:1}
+.gal-nav{position:absolute;top:50%;transform:translateY(-50%);width:46px;height:46px;border-radius:50%;background:rgba(12,29,22,.5);color:#fff;font-size:1.7rem;line-height:1;display:grid;place-items:center;backdrop-filter:blur(4px);transition:.3s;z-index:2;border:none}
+.gal-nav:hover{background:rgba(12,29,22,.82)}
+.gal-prev{left:14px}.gal-next{right:14px}
+.gal-count{position:absolute;top:14px;right:14px;z-index:2;background:rgba(12,29,22,.6);color:#fff;padding:5px 12px;border-radius:100px;font-size:.82rem;font-weight:600;backdrop-filter:blur(4px)}
+.gal-dots{position:absolute;left:0;right:0;bottom:12px;z-index:2;display:flex;justify-content:center;gap:7px;flex-wrap:wrap;padding:0 46px}
+.gal-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.45);cursor:pointer;transition:.3s;border:none;padding:0}
+.gal-dot.on{background:#fff;transform:scale(1.25)}
+@media(max-width:560px){.gal-nav{width:40px;height:40px;font-size:1.5rem}.gal-stage{aspect-ratio:4/3}}
 .map-embed{width:100%;height:340px;border:0;border-radius:16px;display:block;box-shadow:0 16px 40px -30px rgba(12,29,22,.5)}
 .map-addr{margin-top:12px;color:var(--muted);font-size:.94rem}
 .notfound{padding:100px 0;text-align:center}
@@ -226,6 +240,19 @@ if(!h){
       </div>`
     : '';
 
+  // галерея-карусель (если есть фото)
+  const galleryHtml = (h.photos && h.photos.length)
+    ? `<section class="d-gallery"><div class="wrap">
+        <div class="gallery" id="gallery">
+          <div class="gal-stage"><img class="gal-img" id="galA" alt="Фото — ${esc(h.name)}"><img class="gal-img" id="galB" alt=""></div>
+          <button class="gal-nav gal-prev" id="galPrev" aria-label="Предыдущее фото">‹</button>
+          <button class="gal-nav gal-next" id="galNext" aria-label="Следующее фото">›</button>
+          <div class="gal-count"><span id="galCur">1</span>/<span id="galTot"></span></div>
+          <div class="gal-dots" id="galDots"></div>
+        </div>
+      </div></section>`
+    : '';
+
   // сайдбар
   const aside = isRemont
     ? `<div class="aside">
@@ -253,6 +280,7 @@ if(!h){
         <div class="meta">${meta.map(m=>`<span class="chip">${esc(m)}</span>`).join('')}</div>
       </div>
     </header>
+    ${galleryHtml}
     <section class="d-body">
       <div class="wrap cols">
         <div>
@@ -273,6 +301,52 @@ if(!h){
   const navBook = document.getElementById('navBook');
   if(isRemont){ navBook.textContent='К каталогу'; navBook.onclick=()=>{ location.href='/#houses'; }; }
   else { navBook.onclick=()=>window.Booking.open(h.id); }
+
+  // ---------- карусель с автолистанием ----------
+  (function initGallery(){
+    const photos = h.photos || [];
+    if(!photos.length) return;
+    const A=document.getElementById('galA'), B=document.getElementById('galB');
+    const dotsWrap=document.getElementById('galDots'), curEl=document.getElementById('galCur');
+    document.getElementById('galTot').textContent = photos.length;
+    let idx=0, cur=A;
+    A.src=photos[0]; A.classList.add('is-on');
+
+    const showDots = photos.length<=16;
+    if(showDots){
+      photos.forEach((_,i)=>{ const d=document.createElement('button'); d.className='gal-dot'+(i===0?' on':''); d.setAttribute('aria-label','Фото '+(i+1)); d.addEventListener('click',()=>go(i,true)); dotsWrap.appendChild(d); });
+    } else { dotsWrap.style.display='none'; }
+
+    const preload=(n)=>{ const im=new Image(); im.src=photos[(n+photos.length)%photos.length]; };
+    function go(n, user){
+      n=(n+photos.length)%photos.length;
+      if(n===idx) return;
+      const next = cur===A?B:A;
+      next.onload=()=>{ next.classList.add('is-on'); cur.classList.remove('is-on'); cur=next; };
+      next.src=photos[n];
+      if(next.complete) next.onload();
+      idx=n; curEl.textContent=n+1;
+      if(showDots){ [...dotsWrap.children].forEach((d,i)=>d.classList.toggle('on',i===n)); }
+      preload(n+1);
+      if(user) restart();
+    }
+    document.getElementById('galPrev').addEventListener('click',()=>go(idx-1,true));
+    document.getElementById('galNext').addEventListener('click',()=>go(idx+1,true));
+
+    const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let timer=null;
+    const start=()=>{ if(RM || photos.length<2 || timer) return; timer=setInterval(()=>go(idx+1),4500); };
+    const stop=()=>{ if(timer){ clearInterval(timer); timer=null; } };
+    const restart=()=>{ stop(); start(); };
+    const gal=document.getElementById('gallery');
+    gal.addEventListener('mouseenter',stop);
+    gal.addEventListener('mouseleave',start);
+    let sx=0;
+    gal.addEventListener('touchstart',e=>{ sx=e.touches[0].clientX; stop(); },{passive:true});
+    gal.addEventListener('touchend',e=>{ const dx=e.changedTouches[0].clientX-sx; if(Math.abs(dx)>40) go(idx+(dx<0?1:-1),true); else start(); },{passive:true});
+
+    preload(1); start();
+  })();
 }
 </script>
 </body>
