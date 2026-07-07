@@ -61,31 +61,55 @@ function buildTelegramHtml(b, ref) {
  * только в переменных окружения (и перевыпустить бота у @BotFather, т.к. токен засветился).
  */
 const TELEGRAM_BOT_TOKEN_DEFAULT = '8868119198:AAH11Ded58ig6pbq2U4xFSdrJ3-ZouNMyUk';
-// id канала/группы из web.telegram.org/k/#-4325555891
-const TELEGRAM_CHAT_ID_DEFAULT = '-4325555891';
+/**
+ * Получатели заявок (можно несколько через запятую). Приоритет у TELEGRAM_CHAT_ID.
+ * Здесь: личка владельца (7738750071) + чат из web.telegram.org/k/#-4325555891.
+ * Указываем чат и как -4325555891 (обычная группа), и как -1004325555891
+ * (супергруппа/канал) — какой формат верный, туда и уйдёт, второй просто отвалится.
+ */
+const TELEGRAM_CHAT_ID_DEFAULT = '7738750071,-4325555891,-1004325555891';
 
-/** Отправка в Telegram через Bot API (без лишних зависимостей — глобальный fetch) */
-async function sendTelegram(b, ref) {
-  const token = process.env.TELEGRAM_BOT_TOKEN || TELEGRAM_BOT_TOKEN_DEFAULT;
-  const chatId = process.env.TELEGRAM_CHAT_ID || TELEGRAM_CHAT_ID_DEFAULT;
-  if (!token || !chatId) {
-    throw new Error('Telegram не сконфигурирован (нет TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID)');
-  }
-
+/** Отправка одного сообщения в один чат */
+async function sendTelegramTo(token, chatId, text) {
   const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       chat_id: chatId,
-      text: buildTelegramHtml(b, ref),
+      text,
       parse_mode: 'HTML',
       disable_web_page_preview: true,
     }),
   });
-
   const data = await res.json().catch(() => ({}));
   if (!res.ok || !data.ok) {
-    throw new Error(`Telegram API: ${data.description || res.status}`);
+    throw new Error(`chat ${chatId}: ${data.description || res.status}`);
+  }
+  return true;
+}
+
+/**
+ * Отправка в Telegram через Bot API. Шлёт всем получателям из TELEGRAM_CHAT_ID
+ * (через запятую). Успех — если принял хотя бы один; ошибки по остальным логируем.
+ */
+async function sendTelegram(b, ref) {
+  const token = process.env.TELEGRAM_BOT_TOKEN || TELEGRAM_BOT_TOKEN_DEFAULT;
+  const raw = process.env.TELEGRAM_CHAT_ID || TELEGRAM_CHAT_ID_DEFAULT;
+  const ids = raw.split(',').map((s) => s.trim()).filter(Boolean);
+  if (!token || !ids.length) {
+    throw new Error('Telegram не сконфигурирован (нет TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID)');
+  }
+
+  const text = buildTelegramHtml(b, ref);
+  const results = await Promise.allSettled(ids.map((id) => sendTelegramTo(token, id, text)));
+  const ok = results.filter((r) => r.status === 'fulfilled').length;
+  const errs = results.filter((r) => r.status === 'rejected').map((r) => r.reason.message);
+
+  if (errs.length) {
+    console.warn('[telegram] не доставлено части получателей:', errs.join(' | '));
+  }
+  if (ok === 0) {
+    throw new Error('Telegram: ни один получатель не принял — ' + errs.join(' | '));
   }
   return true;
 }
