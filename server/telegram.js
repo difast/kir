@@ -46,6 +46,22 @@ const answer = (id, text) => api('answerCallbackQuery', { callback_query_id: id,
 const fmt = (n) => Number(n).toLocaleString('ru-RU');
 const isAdmin = (id) => ADMIN_IDS.includes(String(id));
 
+// 'YYYY-MM-DD' -> 'DD.MM.YYYY'
+const ruDate = (iso) => { const [y, m, d] = iso.split('-'); return `${d}.${m}.${y}`; };
+const nextIso = (iso) => new Date(Date.parse(iso + 'T00:00:00Z') + 86400000).toISOString().slice(0, 10);
+/** Сжать список дат в диапазоны: ['01','02','03','10'] -> '01.–03., 10.' */
+function compactRanges(dates) {
+  const s = [...dates].sort();
+  if (!s.length) return '';
+  const out = []; let start = s[0], prev = s[0];
+  for (let i = 1; i <= s.length; i++) {
+    if (i < s.length && s[i] === nextIso(prev)) { prev = s[i]; continue; }
+    out.push(start === prev ? ruDate(start) : `${ruDate(start)} – ${ruDate(prev)}`);
+    if (i < s.length) { start = s[i]; prev = s[i]; }
+  }
+  return out.join(', ');
+}
+
 /** Регистрация webhook (вызывается при старте на боевом сервере) */
 async function setWebhook(url, secret) {
   const data = await api('setWebhook', {
@@ -70,10 +86,11 @@ const MONTH_HELP =
 
 // ---------- клавиатуры ----------
 function menuKb() {
-  return { inline_keyboard: [[
-    { text: '💰 Цены', callback_data: 'menu:price' },
-    { text: '📅 Занятость', callback_data: 'menu:busy' },
-  ]] };
+  return { inline_keyboard: [
+    [{ text: '💰 Цены', callback_data: 'menu:price' },
+     { text: '📅 Занятость', callback_data: 'menu:busy' }],
+    [{ text: '👁 Обзор занятости', callback_data: 'menu:overview' }],
+  ] };
 }
 function housesKb(prefix) {
   return { inline_keyboard: HOUSES.map((h) => [{
@@ -94,7 +111,9 @@ function busyModeKb(id) {
   return { inline_keyboard: [
     [{ text: '🔴 Занять даты', callback_data: 'bm:occupy:' + id }],
     [{ text: '🟢 Освободить даты', callback_data: 'bm:free:' + id }],
-    [{ text: '← Дома', callback_data: 'menu:busy' }],
+    [{ text: '🧹 Сбросить всю занятость', callback_data: 'bm:clear:' + id }],
+    [{ text: '👁 Обзор занятости', callback_data: 'menu:overview' },
+     { text: '← Дома', callback_data: 'menu:busy' }],
   ] };
 }
 
@@ -102,7 +121,17 @@ const menuText = 'Панель GreenPark. Что меняем?';
 
 function busyInfo(id) {
   const b = store.getBusy(id);
-  return b.length ? b.join(', ') : 'нет занятых дат';
+  return b.length ? compactRanges(b) : 'нет занятых дат';
+}
+/** Обзор занятости по всем домам */
+function overviewText() {
+  let out = '📅 <b>Занятость по домам</b>\n';
+  HOUSES.filter((h) => h.status !== 'renovation').forEach((h) => {
+    const b = store.getBusy(h.id);
+    out += `\n<b>${h.name}</b>\n` + (b.length ? `${compactRanges(b)} — занято дней: ${b.length}` : '✅ свободно') + '\n';
+  });
+  out += '\nЧтобы изменить — «📅 Занятость» → выберите дом.';
+  return out;
 }
 function priceDatesInfo(id) {
   const pd = store.getPriceDates(id);
@@ -135,6 +164,7 @@ async function onMessage(msg) {
   if (/^\/(start|help|menu)/.test(text)) { pending.delete(chatId); return send(chatId, menuText, { reply_markup: menuKb() }); }
   if (/^\/price/.test(text)) { pending.delete(chatId); return send(chatId, 'Шаг 1. Выберите дом, цену которого меняем:', { reply_markup: housesKb('price') }); }
   if (/^\/busy|^\/calendar/.test(text)) { pending.delete(chatId); return send(chatId, 'Шаг 1. Выберите дом для управления занятостью:', { reply_markup: housesKb('busy') }); }
+  if (/^\/(overview|occupancy|zanyatost)/.test(text)) { pending.delete(chatId); return send(chatId, overviewText(), { reply_markup: menuKb() }); }
 
   const p = pending.get(chatId);
   if (!p) return send(chatId, menuText, { reply_markup: menuKb() });
@@ -213,6 +243,7 @@ async function onCallback(cq) {
   if (data === 'menu:main') { pending.delete(chatId); return send(chatId, menuText, { reply_markup: menuKb() }); }
   if (data === 'menu:price') { pending.delete(chatId); return send(chatId, 'Шаг 1. Выберите дом, цену которого меняем:', { reply_markup: housesKb('price') }); }
   if (data === 'menu:busy') { pending.delete(chatId); return send(chatId, 'Шаг 1. Выберите дом для управления занятостью:', { reply_markup: housesKb('busy') }); }
+  if (data === 'menu:overview') { pending.delete(chatId); return send(chatId, overviewText(), { reply_markup: menuKb() }); }
 
   const parts = data.split(':');
   const kind = parts[0];
@@ -271,6 +302,12 @@ async function onCallback(cq) {
     const mode = parts[1], id = parts[2];
     const house = getHouse(id);
     if (!house) return;
+    if (mode === 'clear') {
+      const all = store.getBusy(id);
+      if (all.length) store.setBusyDates(id, all, false);
+      pending.delete(chatId);
+      return send(chatId, `🧹 Вся занятость «${house.name}» снята — все даты свободны.`, { reply_markup: busyModeKb(id) });
+    }
     pending.set(chatId, { action: 'busy', mode, id });
     const verb = mode === 'occupy' ? 'занять' : 'освободить';
     return send(chatId, `Шаг 3. «${house.name}» — какие даты ${verb}?\n\n${DATE_HELP}`);
