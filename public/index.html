@@ -545,7 +545,7 @@ footer a:hover{color:var(--honey)}
 <script src="/houses-data.js"></script>
 <script>
 /* актуальные цены и занятость из хранилища (меняются админом через бота) */
-(function(){var s=window.__STATE__||{prices:{},busy:{}};(window.__HOUSES__||[]).forEach(function(h){if(s.prices&&s.prices[h.id]!=null)h.price=+s.prices[h.id];h.busy=(s.busy&&s.busy[h.id])||[];});})();
+(function(){var s=window.__STATE__||{prices:{},priceDates:{},busy:{}};(window.__HOUSES__||[]).forEach(function(h){if(s.prices&&s.prices[h.id]!=null)h.price=+s.prices[h.id];h.priceDates=(s.priceDates&&s.priceDates[h.id])||{};h.busy=(s.busy&&s.busy[h.id])||[];});})();
 </script>
 <script src="/booking.js"></script>
 <script>
@@ -591,8 +591,13 @@ houses.forEach((h,i)=>{
   const cover = cardPhotos.length
     ? `<img class="card-cover on" src="${cardPhotos[0]}" alt="${h.name}" loading="lazy" decoding="async"><img class="card-cover" alt="" decoding="async">`
     : scene(h.type);
+  // если на будущие даты заданы спеццены — показываем «от {минимальной}»
+  const today=new Date().toISOString().slice(0,10);
+  const future=Object.keys(h.priceDates||{}).filter(d=>d>=today).map(d=>+h.priceDates[d]);
+  const priceMin=future.length?Math.min(h.price,...future):h.price;
+  const priceFrom=h.priceFrom||(future.length>0&&future.some(p=>p!==h.price));
   card.innerHTML=`
-    <a class="scene-link" href="${href}"><div class="scene">${cover}<div class="price-tag">${h.priceFrom?'от ':''}${fmt(h.price)} ₽<small>/сутки</small></div></div></a>
+    <a class="scene-link" href="${href}"><div class="scene">${cover}<div class="price-tag">${priceFrom?'от ':''}${fmt(priceMin)} ₽<small>/сутки</small></div></div></a>
     <div class="card-body">
       <h3><a href="${href}">${h.name}</a></h3>
       <div class="loc">${h.loc}</div>

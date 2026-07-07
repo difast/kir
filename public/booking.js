@@ -147,15 +147,32 @@
     }
     return false;
   }
+  /** Цена конкретной ночи: спеццена даты или базовая */
+  function priceForDate(h, dateStr) {
+    const pd = h.priceDates || {};
+    return pd[dateStr] != null ? +pd[dateStr] : h.price;
+  }
+  /** Сумма за выбранные ночи с учётом спеццен. Возвращает {total, allBase, min, max} */
+  function rangeTotal(h) {
+    const DAY = 86400000; let total = 0, min = Infinity, max = -Infinity, allBase = true;
+    for (let t = Date.parse(elIn.value); t < Date.parse(elOut.value); t += DAY) {
+      const p = priceForDate(h, new Date(t).toISOString().slice(0, 10));
+      total += p; if (p < min) min = p; if (p > max) max = p; if (p !== h.price) allBase = false;
+    }
+    return { total, allBase, min, max };
+  }
   function calcSummary() {
     const h = houses.find((x) => x.id === fHouse.value), n = nights();
     if (!h || n < 1) { summary.innerHTML = '<div class="line"><span>Выберите даты, чтобы рассчитать стоимость</span></div>'; return; }
     if (rangeBusy(h)) { summary.innerHTML = '<div class="line" style="color:var(--clay);font-weight:600"><span>На эти даты дом занят — выберите другие</span></div>'; return; }
-    const total = h.price * n;
+    const r = rangeTotal(h);
+    const label = r.allBase
+      ? `${fmt(h.price)} ₽ × ${n} ${nWord(n)}`
+      : (r.min === r.max ? `${fmt(r.min)} ₽ × ${n} ${nWord(n)}` : `${n} ${nWord(n)} · ${fmt(r.min)}–${fmt(r.max)} ₽/сутки`);
     summary.innerHTML =
-      `<div class="line"><span>${fmt(h.price)} ₽ × ${n} ${nWord(n)}</span><span>${fmt(total)} ₽</span></div>
+      `<div class="line"><span>${label}</span><span>${fmt(r.total)} ₽</span></div>
        <div class="line"><span>Уборка и бельё</span><span>включено</span></div>
-       <div class="total"><span>Итого</span><span>${fmt(total)} ₽</span></div>`;
+       <div class="total"><span>Итого</span><span>${fmt(r.total)} ₽</span></div>`;
   }
 
   fHouse.addEventListener('change', () => { updateHouseLabel(); calcSummary(); });
@@ -217,7 +234,7 @@
     setErr('g-phone', phone.replace(/\D/g, '').length < 10);
     if (!ok) return;
 
-    const h = houses.find((x) => x.id === fHouse.value), n = nights(), total = h.price * n;
+    const h = houses.find((x) => x.id === fHouse.value), n = nights(), total = rangeTotal(h).total;
     const guests = +document.getElementById('f-guests').value;
     const hp = document.getElementById('f-company').value.trim();
     const errBox = document.getElementById('submitErr');

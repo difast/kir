@@ -61,8 +61,9 @@ function validateBooking(body) {
     return { ok: false, error: 'Выбранные даты уже заняты. Пожалуйста, выберите другие.' };
   }
 
-  // Сумму считаем сами из актуальной цены (хранилище) — цене от клиента не доверяем.
-  const total = store.getPrice(house.id) * nights;
+  // Сумму считаем сами по ценам каждой ночи (спеццены/сезон/месяц или базовая) —
+  // цене от клиента не доверяем.
+  const total = store.nightsTotal(house.id, body.checkIn, body.checkOut);
 
   return {
     ok: true,

@@ -3,6 +3,15 @@
 /**
  * Админ-команды в Telegram: смена цен и занятости через того же бота.
  * Приём — через webhook (см. маршрут в index.js). Доступ — только у ADMIN_IDS.
+ *
+ * Что умеет:
+ *  • Цены: базовая (за сутки), спеццена на конкретные даты/диапазон, помесячно,
+ *    сброс всех спеццен дома.
+ *  • Занятость: занять/освободить даты (в форме брони занятые даты недоступны).
+ *  • Даты вводятся в свободном формате «день месяц год» — с пробелами, точками,
+ *    дефисами или без разделителей: 10.08.2026 / 10 08 2026 / 10082026, диапазон
+ *    10.08.2026 - 20.08.2026, несколько через запятую/перенос строки.
+ *  • Перед каждым шагом бот даёт короткую инструкцию.
  */
 const { botToken } = require('./notify');
 const store = require('./store');
@@ -11,7 +20,7 @@ const { HOUSES, getHouse } = require('./houses');
 const ADMIN_IDS = (process.env.ADMIN_IDS || '7738750071,1203192763')
   .split(',').map((s) => s.trim()).filter(Boolean);
 
-// краткое состояние диалога: chatId -> { action:'price'|'busy', id }
+// краткое состояние диалога: chatId -> { action, mode, id, step, dates }
 const pending = new Map();
 
 const API = (method) => `https://api.telegram.org/bot${botToken()}/${method}`;
@@ -49,6 +58,16 @@ async function setWebhook(url, secret) {
   return data;
 }
 
+// ---------- тексты-подсказки ----------
+const DATE_HELP =
+  'Формат даты — свободный, главное <b>день, месяц, год</b>. Разделители любые ' +
+  '(точка, пробел, дефис) или без них:\n' +
+  '• одна дата: <code>10.08.2026</code>, <code>10 08 2026</code>, <code>10082026</code>\n' +
+  '• диапазон: <code>10.08.2026 - 20.08.2026</code> или <code>10.08.2026 по 20.08.2026</code>\n' +
+  '• несколько сразу — через запятую или с новой строки.';
+const MONTH_HELP =
+  'Пришлите <b>месяц и год</b>: <code>08 2026</code>, <code>08.2026</code> или <code>2026-08</code>.';
+
 // ---------- клавиатуры ----------
 function menuKb() {
   return { inline_keyboard: [[
@@ -62,12 +81,36 @@ function housesKb(prefix) {
     callback_data: prefix + ':' + h.id,
   }]).concat([[{ text: '← Меню', callback_data: 'menu:main' }]]) };
 }
+function priceModeKb(id) {
+  return { inline_keyboard: [
+    [{ text: '🏷 Базовая цена', callback_data: 'pm:base:' + id }],
+    [{ text: '📆 Цена на даты', callback_data: 'pm:dates:' + id }],
+    [{ text: '🗓 Цена на месяц', callback_data: 'pm:month:' + id }],
+    [{ text: '♻️ Сбросить спеццены', callback_data: 'pm:clear:' + id }],
+    [{ text: '← Дома', callback_data: 'menu:price' }],
+  ] };
+}
+function busyModeKb(id) {
+  return { inline_keyboard: [
+    [{ text: '🔴 Занять даты', callback_data: 'bm:occupy:' + id }],
+    [{ text: '🟢 Освободить даты', callback_data: 'bm:free:' + id }],
+    [{ text: '← Дома', callback_data: 'menu:busy' }],
+  ] };
+}
 
 const menuText = 'Панель GreenPark. Что меняем?';
 
 function busyInfo(id) {
   const b = store.getBusy(id);
   return b.length ? b.join(', ') : 'нет занятых дат';
+}
+function priceDatesInfo(id) {
+  const pd = store.getPriceDates(id);
+  const keys = Object.keys(pd).sort();
+  if (!keys.length) return 'спеццен нет (везде базовая)';
+  const n = keys.length;
+  const preview = keys.slice(0, 6).map((d) => `${d}: ${fmt(pd[d])} ₽`).join(', ');
+  return preview + (n > 6 ? ` … и ещё ${n - 6}` : '');
 }
 
 // ---------- обработка апдейтов ----------
@@ -90,8 +133,8 @@ async function onMessage(msg) {
   }
 
   if (/^\/(start|help|menu)/.test(text)) { pending.delete(chatId); return send(chatId, menuText, { reply_markup: menuKb() }); }
-  if (/^\/price/.test(text)) return send(chatId, 'Выберите дом, чтобы изменить цену:', { reply_markup: housesKb('price') });
-  if (/^\/busy|^\/calendar/.test(text)) return send(chatId, 'Выберите дом для управления занятостью:', { reply_markup: housesKb('busy') });
+  if (/^\/price/.test(text)) { pending.delete(chatId); return send(chatId, 'Шаг 1. Выберите дом, цену которого меняем:', { reply_markup: housesKb('price') }); }
+  if (/^\/busy|^\/calendar/.test(text)) { pending.delete(chatId); return send(chatId, 'Шаг 1. Выберите дом для управления занятостью:', { reply_markup: housesKb('busy') }); }
 
   const p = pending.get(chatId);
   if (!p) return send(chatId, menuText, { reply_markup: menuKb() });
@@ -99,35 +142,68 @@ async function onMessage(msg) {
   const house = getHouse(p.id);
   if (!house) { pending.delete(chatId); return send(chatId, 'Дом не найден.', { reply_markup: menuKb() }); }
 
-  if (p.action === 'price') {
+  if (p.action === 'price') return onPriceInput(chatId, house, p, text);
+  if (p.action === 'busy') return onBusyInput(chatId, house, p, text);
+}
+
+// ---------- ввод для цен ----------
+async function onPriceInput(chatId, house, p, text) {
+  // Режим «базовая» — сразу число.
+  if (p.mode === 'base') {
     const n = parseInt(text.replace(/[^\d]/g, ''), 10);
-    if (!Number.isFinite(n) || n <= 0) return send(chatId, 'Нужно число (рублей за сутки). Попробуйте ещё раз:');
+    if (!Number.isFinite(n) || n <= 0) return send(chatId, 'Нужно число — рублей за сутки. Попробуйте ещё раз:');
     store.setPrice(p.id, n);
     pending.delete(chatId);
-    return send(chatId, `✅ Цена «${house.name}» — <b>${fmt(n)} ₽/сутки</b>.`, { reply_markup: menuKb() });
+    return send(chatId, `✅ Базовая цена «${house.name}» — <b>${fmt(n)} ₽/сутки</b>.`, { reply_markup: menuKb() });
   }
 
-  if (p.action === 'busy') {
-    const tokens = text.split(/\s+/).filter(Boolean);
-    let added = 0, removed = 0;
-    const bad = [];
-    for (const tk of tokens) {
-      const free = tk.startsWith('-');
-      const range = store.expandRange(free ? tk.slice(1) : tk);
-      if (!range) { bad.push(tk); continue; }
-      store.setBusyDates(p.id, range, !free);
-      if (free) removed += range.length; else added += range.length;
-    }
+  // Режимы «на даты» / «на месяц» — сначала даты, потом цена.
+  if (p.step === 'dates') {
+    const { dates, bad } = store.parseDateEntries(text);
+    if (!dates.length) return send(chatId, `Не удалось распознать даты${bad.length ? ` (${bad.join(', ')})` : ''}.\n\n${DATE_HELP}`);
+    p.dates = dates; p.step = 'price'; pending.set(chatId, p);
+    let out = `Шаг 3. Выбрано дат: <b>${dates.length}</b> (${dates.slice(0, 6).join(', ')}${dates.length > 6 ? ' …' : ''}).\n`;
+    if (bad.length) out += `Не распознано и пропущено: ${bad.join(', ')}\n`;
+    out += `\nТеперь пришлите <b>цену за сутки</b> для этих дат (число в рублях). Чтобы вернуть базовую цену на эти даты — пришлите <code>0</code>.`;
+    return send(chatId, out);
+  }
+
+  if (p.step === 'month') {
+    const dates = store.monthDates(text);
+    if (!dates) return send(chatId, `Не удалось распознать месяц.\n\n${MONTH_HELP}`);
+    p.dates = dates; p.step = 'price'; p.monthLabel = text.trim(); pending.set(chatId, p);
+    return send(chatId,
+      `Шаг 3. Месяц распознан: <b>${dates.length}</b> дней (${dates[0]} … ${dates[dates.length - 1]}).\n\n` +
+      `Теперь пришлите <b>цену за сутки</b> на весь этот месяц (число в рублях). Чтобы вернуть базовую цену — пришлите <code>0</code>.`);
+  }
+
+  if (p.step === 'price') {
+    const raw = text.replace(/[^\d]/g, '');
+    if (raw === '' && !/^0/.test(text.trim())) return send(chatId, 'Нужно число — рублей за сутки (или 0, чтобы вернуть базовую цену):');
+    const n = parseInt(raw || '0', 10);
+    store.setPriceDates(p.id, p.dates, n);
+    const cnt = p.dates.length;
     pending.delete(chatId);
-    let out = `Дом «${house.name}».\n`;
-    if (added) out += `Занято дат: +${added}\n`;
-    if (removed) out += `Освобождено дат: ${removed}\n`;
-    if (bad.length) out += `Не распознано: ${bad.join(', ')}\n`;
-    out += `\nТекущая занятость: <b>${busyInfo(p.id)}</b>`;
-    return send(chatId, out, { reply_markup: menuKb() });
+    if (n === 0) return send(chatId, `♻️ На ${cnt} дат(ы) «${house.name}» вернулась базовая цена <b>${fmt(store.getPrice(p.id))} ₽/сутки</b>.`, { reply_markup: menuKb() });
+    return send(chatId, `✅ На ${cnt} дат(ы) «${house.name}» установлена цена <b>${fmt(n)} ₽/сутки</b>.`, { reply_markup: menuKb() });
   }
 }
 
+// ---------- ввод для занятости ----------
+async function onBusyInput(chatId, house, p, text) {
+  const { dates, bad } = store.parseDateEntries(text);
+  if (!dates.length) return send(chatId, `Не удалось распознать даты${bad.length ? ` (${bad.join(', ')})` : ''}.\n\n${DATE_HELP}`);
+  const occupy = p.mode === 'occupy';
+  store.setBusyDates(p.id, dates, occupy);
+  pending.delete(chatId);
+  let out = `Дом «${house.name}».\n`;
+  out += occupy ? `🔴 Занято дат: +${dates.length}\n` : `🟢 Освобождено дат: ${dates.length}\n`;
+  if (bad.length) out += `Не распознано: ${bad.join(', ')}\n`;
+  out += `\nТекущая занятость: <b>${busyInfo(p.id)}</b>`;
+  return send(chatId, out, { reply_markup: menuKb() });
+}
+
+// ---------- callback-кнопки ----------
 async function onCallback(cq) {
   const chatId = cq.message.chat.id;
   const data = cq.data || '';
@@ -135,25 +211,69 @@ async function onCallback(cq) {
   if (!isAdmin(chatId)) return;
 
   if (data === 'menu:main') { pending.delete(chatId); return send(chatId, menuText, { reply_markup: menuKb() }); }
-  if (data === 'menu:price') return send(chatId, 'Выберите дом, чтобы изменить цену:', { reply_markup: housesKb('price') });
-  if (data === 'menu:busy') return send(chatId, 'Выберите дом для управления занятостью:', { reply_markup: housesKb('busy') });
+  if (data === 'menu:price') { pending.delete(chatId); return send(chatId, 'Шаг 1. Выберите дом, цену которого меняем:', { reply_markup: housesKb('price') }); }
+  if (data === 'menu:busy') { pending.delete(chatId); return send(chatId, 'Шаг 1. Выберите дом для управления занятостью:', { reply_markup: housesKb('busy') }); }
 
-  const [action, id] = data.split(':');
-  const house = getHouse(id);
-  if (!house) return;
+  const parts = data.split(':');
+  const kind = parts[0];
 
-  if (action === 'price') {
-    pending.set(chatId, { action: 'price', id });
-    return send(chatId, `Дом «${house.name}». Текущая цена: <b>${fmt(store.getPrice(id))} ₽</b>.\nВведите новую цену (число в рублях за сутки):`);
-  }
-  if (action === 'busy') {
-    pending.set(chatId, { action: 'busy', id });
+  // Выбор дома в разделе «Цены»
+  if (kind === 'price') {
+    const house = getHouse(parts[1]);
+    if (!house) return;
+    pending.delete(chatId);
     return send(chatId,
-      `Дом «${house.name}». Занятость сейчас: <b>${busyInfo(id)}</b>.\n\n` +
-      `Пришлите даты:\n` +
-      `• занять: <code>2026-08-10</code> или диапазон <code>2026-08-10..2026-08-15</code>\n` +
-      `• освободить: со знаком «−», напр. <code>-2026-08-10</code> или <code>-2026-08-10..2026-08-15</code>\n` +
-      `Можно несколько через пробел.`);
+      `Дом «${house.name}».\n` +
+      `Базовая цена: <b>${fmt(store.getPrice(house.id))} ₽/сутки</b>.\n` +
+      `Спеццены: ${priceDatesInfo(house.id)}\n\n` +
+      `Шаг 2. Что настраиваем?`,
+      { reply_markup: priceModeKb(house.id) });
+  }
+
+  // Выбор дома в разделе «Занятость»
+  if (kind === 'busy') {
+    const house = getHouse(parts[1]);
+    if (!house) return;
+    pending.delete(chatId);
+    return send(chatId,
+      `Дом «${house.name}».\nЗанятость сейчас: <b>${busyInfo(house.id)}</b>.\n\n` +
+      `Шаг 2. Занять или освободить даты?`,
+      { reply_markup: busyModeKb(house.id) });
+  }
+
+  // Режим цены
+  if (kind === 'pm') {
+    const mode = parts[1], id = parts[2];
+    const house = getHouse(id);
+    if (!house) return;
+
+    if (mode === 'base') {
+      pending.set(chatId, { action: 'price', mode: 'base', id });
+      return send(chatId, `Шаг 3. «${house.name}» — базовая цена сейчас <b>${fmt(store.getPrice(id))} ₽</b>.\nПришлите новую цену за сутки (число в рублях):`);
+    }
+    if (mode === 'dates') {
+      pending.set(chatId, { action: 'price', mode: 'dates', id, step: 'dates' });
+      return send(chatId, `Шаг 2 из 3. «${house.name}» — на какие даты меняем цену?\n\n${DATE_HELP}`);
+    }
+    if (mode === 'month') {
+      pending.set(chatId, { action: 'price', mode: 'month', id, step: 'month' });
+      return send(chatId, `Шаг 2 из 3. «${house.name}» — цена на какой месяц?\n\n${MONTH_HELP}`);
+    }
+    if (mode === 'clear') {
+      store.clearPriceDates(id);
+      pending.delete(chatId);
+      return send(chatId, `♻️ Все спеццены «${house.name}» сброшены — везде базовая цена <b>${fmt(store.getPrice(id))} ₽/сутки</b>.`, { reply_markup: menuKb() });
+    }
+  }
+
+  // Режим занятости
+  if (kind === 'bm') {
+    const mode = parts[1], id = parts[2];
+    const house = getHouse(id);
+    if (!house) return;
+    pending.set(chatId, { action: 'busy', mode, id });
+    const verb = mode === 'occupy' ? 'занять' : 'освободить';
+    return send(chatId, `Шаг 3. «${house.name}» — какие даты ${verb}?\n\n${DATE_HELP}`);
   }
 }
 
