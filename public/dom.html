@@ -183,8 +183,12 @@ footer a:hover{color:var(--honey)}
   </div>
 </footer>
 
+<script src="/api/state.js"></script>
 <script src="/scene.js"></script>
 <script src="/houses-data.js"></script>
+<script>
+(function(){var s=window.__STATE__||{prices:{},busy:{}};(window.__HOUSES__||[]).forEach(function(h){if(s.prices&&s.prices[h.id]!=null)h.price=+s.prices[h.id];h.busy=(s.busy&&s.busy[h.id])||[];});})();
+</script>
 <script src="/booking.js"></script>
 <script>
 "use strict";

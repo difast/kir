@@ -540,8 +540,13 @@ footer a:hover{color:var(--honey)}
 
 <!-- Модалка бронирования подключается из /booking.js (разметка + логика), стили — /modal.css -->
 
+<script src="/api/state.js"></script>
 <script src="/scene.js"></script>
 <script src="/houses-data.js"></script>
+<script>
+/* актуальные цены и занятость из хранилища (меняются админом через бота) */
+(function(){var s=window.__STATE__||{prices:{},busy:{}};(window.__HOUSES__||[]).forEach(function(h){if(s.prices&&s.prices[h.id]!=null)h.price=+s.prices[h.id];h.busy=(s.busy&&s.busy[h.id])||[];});})();
+</script>
 <script src="/booking.js"></script>
 <script>
 "use strict";

@@ -1,6 +1,7 @@
 'use strict';
 
 const { getHouse } = require('./houses');
+const store = require('./store');
 
 const MS_DAY = 24 * 60 * 60 * 1000;
 
@@ -55,8 +56,13 @@ function validateBooking(body) {
   let guests = parseInt(body.guests, 10);
   if (!Number.isFinite(guests) || guests < 1) guests = 1;
 
-  // Сумму считаем сами — цене от клиента не доверяем.
-  const total = house.price * nights;
+  // Занятость: даты не должны пересекаться с занятыми (админ отмечает их через бота).
+  if (!store.isRangeFree(house.id, body.checkIn, body.checkOut)) {
+    return { ok: false, error: 'Выбранные даты уже заняты. Пожалуйста, выберите другие.' };
+  }
+
+  // Сумму считаем сами из актуальной цены (хранилище) — цене от клиента не доверяем.
+  const total = store.getPrice(house.id) * nights;
 
   return {
     ok: true,

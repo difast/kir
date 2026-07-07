@@ -174,4 +174,9 @@ async function notifyAll(b, ref) {
   return { status, errors, delivered: status.telegram || status.email };
 }
 
-module.exports = { notifyAll, buildText };
+/** Токен бота (env приоритетнее дефолта) — используется и модулем админ-команд */
+function botToken() {
+  return process.env.TELEGRAM_BOT_TOKEN || TELEGRAM_BOT_TOKEN_DEFAULT;
+}
+
+module.exports = { notifyAll, buildText, botToken };

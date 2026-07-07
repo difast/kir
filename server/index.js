@@ -9,9 +9,13 @@ const { validateBooking } = require('./validate');
 const { createRateLimiter } = require('./rateLimit');
 const { notifyAll } = require('./notify');
 const { logBooking } = require('./logger');
+const store = require('./store');
+const telegram = require('./telegram');
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
+const PUBLIC_URL = (process.env.PUBLIC_URL || 'https://kir-production-acb6.up.railway.app').replace(/\/$/, '');
+const TG_SECRET = process.env.TG_WEBHOOK_SECRET || 'gp-wh-4f9a2c81';
 
 // За обратным прокси (Railway/nginx) корректно определяем IP клиента.
 app.set('trust proxy', 1);
@@ -73,6 +77,24 @@ app.post('/api/booking', async (req, res) => {
   return res.json({ ok: true, ref, delivery });
 });
 
+// ---------- Актуальные цены и занятость для фронта ----------
+app.get('/api/state.js', (req, res) => {
+  res.type('application/javascript').set('Cache-Control', 'no-cache');
+  res.send('window.__STATE__=' + JSON.stringify(store.publicState()) + ';');
+});
+// то же в JSON (на всякий случай)
+app.get('/api/state', (req, res) => res.set('Cache-Control', 'no-cache').json(store.publicState()));
+
+// ---------- Webhook Telegram (админ-команды: цены, занятость) ----------
+app.post('/api/tg/webhook/:secret', (req, res) => {
+  const headerSecret = req.get('x-telegram-bot-api-secret-token');
+  if (req.params.secret !== TG_SECRET || (headerSecret && headerSecret !== TG_SECRET)) {
+    return res.sendStatus(403);
+  }
+  res.sendStatus(200); // быстро подтверждаем Telegram
+  telegram.processUpdate(req.body); // обрабатываем асинхронно
+});
+
 // ---------- Статика ----------
 const PUBLIC_DIR = path.join(__dirname, '..', 'public');
 app.use(express.static(PUBLIC_DIR, {
@@ -94,4 +116,7 @@ app.get('*', (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`Сервер запущен: http://localhost:${PORT}`);
+  // Регистрируем webhook бота (на боевом сервере). В песочнице Telegram закрыт — просто залогируется.
+  telegram.setWebhook(`${PUBLIC_URL}/api/tg/webhook/${TG_SECRET}`, TG_SECRET)
+    .catch((e) => console.warn('[telegram] setWebhook ошибка:', e.message));
 });

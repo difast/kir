@@ -138,9 +138,19 @@
     const h = houses.find((x) => x.id === fHouse.value);
     mHouse.textContent = h ? `${h.name} · ${fmt(h.price)} ₽ за сутки · до ${h.cap} гостей` : 'Выберите дом ниже';
   }
+  /** Пересекается ли выбранный диапазон с занятыми датами дома */
+  function rangeBusy(h) {
+    if (!h || !h.busy || !h.busy.length || !elIn.value || !elOut.value) return false;
+    const busy = new Set(h.busy), DAY = 86400000;
+    for (let t = Date.parse(elIn.value); t < Date.parse(elOut.value); t += DAY) {
+      if (busy.has(new Date(t).toISOString().slice(0, 10))) return true;
+    }
+    return false;
+  }
   function calcSummary() {
     const h = houses.find((x) => x.id === fHouse.value), n = nights();
     if (!h || n < 1) { summary.innerHTML = '<div class="line"><span>Выберите даты, чтобы рассчитать стоимость</span></div>'; return; }
+    if (rangeBusy(h)) { summary.innerHTML = '<div class="line" style="color:var(--clay);font-weight:600"><span>На эти даты дом занят — выберите другие</span></div>'; return; }
     const total = h.price * n;
     summary.innerHTML =
       `<div class="line"><span>${fmt(h.price)} ₽ × ${n} ${nWord(n)}</span><span>${fmt(total)} ₽</span></div>
@@ -214,6 +224,15 @@
     errBox.style.display = 'none';
 
     if (hp) { showSuccess(h, n, total, name, 'ZG-000000'); return; } // honeypot: бот
+
+    // занятые даты — не даём отправить
+    if (rangeBusy(h)) {
+      document.getElementById('g-in').classList.add('invalid');
+      document.getElementById('g-out').classList.add('invalid');
+      errBox.textContent = 'Выбранные даты уже заняты. Пожалуйста, выберите другие.';
+      errBox.style.display = 'block';
+      return;
+    }
 
     const payload = { house: h.id, houseName: h.name, checkIn: elIn.value, checkOut: elOut.value, nights: n, guests, name, phone, total, company: hp };
     const oldText = submitBtn.textContent;
