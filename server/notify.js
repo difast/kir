@@ -61,7 +61,8 @@ function buildTelegramHtml(b, ref) {
  * только в переменных окружения (и перевыпустить бота у @BotFather, т.к. токен засветился).
  */
 const TELEGRAM_BOT_TOKEN_DEFAULT = '8868119198:AAH11Ded58ig6pbq2U4xFSdrJ3-ZouNMyUk';
-const TELEGRAM_CHAT_ID_DEFAULT = '7738750071';
+// id канала/группы из web.telegram.org/k/#-4325555891
+const TELEGRAM_CHAT_ID_DEFAULT = '-4325555891';
 
 /** Отправка в Telegram через Bot API (без лишних зависимостей — глобальный fetch) */
 async function sendTelegram(b, ref) {
