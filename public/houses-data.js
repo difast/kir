@@ -45,7 +45,7 @@ window.__HOUSES__ = [
     ],
     rules: {
       checkIn: '15:00',
-      checkOut: '13:00',
+      checkOut: '12:00',
       deposit: 15000,
       items: [
         'Можно с детьми',

@@ -35,12 +35,15 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 .nav-actions{display:flex;align-items:center;gap:14px}
 .nav-phone{font-size:.9rem;font-weight:700;white-space:nowrap;transition:opacity .3s}
 .nav-phone:hover{opacity:.7}
+.nav-phones{display:flex;flex-direction:column;gap:1px;font-size:.8rem;font-weight:700;white-space:nowrap;line-height:1.25}
+.nav-phones a{transition:opacity .3s}
+.nav-phones a:hover{opacity:.7}
 .tg-ic{width:36px;height:36px;border-radius:50%;border:1px solid rgba(236,228,211,.4);display:grid;place-items:center;transition:.35s;flex:none}
 .tg-ic svg{width:18px;height:18px}
 .tg-ic svg path{fill:var(--on-dark);transition:fill .35s}
 .tg-ic:hover{background:var(--honey);border-color:var(--honey)}
 .tg-ic:hover svg path{fill:var(--ink)}
-@media(max-width:520px){.nav-phone{display:none}.nav-actions{gap:10px}.nav-cta{padding:9px 15px;font-size:.8rem}.tg-ic{width:34px;height:34px}}
+@media(max-width:520px){.nav-phone,.nav-phones{display:none}.nav-actions{gap:10px}.nav-cta{padding:9px 15px;font-size:.8rem}.tg-ic{width:34px;height:34px}}
 
 /* hero */
 .d-hero{position:relative;background:var(--pine);color:var(--on-dark);overflow:hidden}
@@ -148,7 +151,10 @@ footer a:hover{color:var(--honey)}
   <div class="wrap">
     <a class="brand" href="/"><svg class="mk" viewBox="0 0 40 40" fill="none"><path d="M20 4 L34 16 V34 H24 V24 H16 V34 H6 V16 Z" stroke="#E7A64C" stroke-width="2.2" stroke-linejoin="round"/><rect x="17" y="12" width="6" height="6" fill="#E7A64C"/></svg>GreenPark</a>
     <div class="nav-actions">
-      <a class="nav-phone" href="tel:+79182030181">+7 918 203 01 81</a>
+      <div class="nav-phones">
+        <a href="tel:+79182030181">+7 918 203 01 81</a>
+        <a href="tel:+79189006621">+7 918 900 66 21</a>
+      </div>
       <a class="tg-ic" href="https://t.me/+79182030181" target="_blank" rel="noopener" aria-label="Telegram"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.78 18.65l.28-4.23 7.68-6.92c.34-.31-.07-.46-.52-.19L7.74 13.3 3.64 12c-.88-.25-.89-.86.2-1.3l15.97-6.16c.73-.33 1.43.18 1.15 1.3l-2.72 12.81c-.19.91-.74 1.13-1.5.71L12.6 16.3l-1.99 1.93c-.23.23-.42.42-.83.42z"/></svg></a>
       <button class="nav-cta" id="navBook">Забронировать</button>
     </div>
@@ -168,6 +174,7 @@ footer a:hover{color:var(--honey)}
     <div class="fcol"><h4>Навигация</h4><div><a href="/#houses">Дома</a></div><div><a href="/#how">Как забронировать</a></div><div><a href="/#reviews">Отзывы</a></div><div><a href="/#faq">Вопросы</a></div></div>
     <div class="fcol"><h4>Контакты</h4>
       <div><a href="tel:+79182030181">+7 918 203 01 81</a></div>
+      <div><a href="tel:+79189006621">+7 918 900 66 21</a></div>
       <div><a class="f-tg" href="https://t.me/+79182030181" target="_blank" rel="noopener" aria-label="Telegram"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.78 18.65l.28-4.23 7.68-6.92c.34-.31-.07-.46-.52-.19L7.74 13.3 3.64 12c-.88-.25-.89-.86.2-1.3l15.97-6.16c.73-.33 1.43.18 1.15 1.3l-2.72 12.81c-.19.91-.74 1.13-1.5.71L12.6 16.3l-1.99 1.93c-.23.23-.42.42-.83.42z"/></svg></a></div>
       <div><a href="mailto:ol.mashina2017@yandex.ru">ol.mashina2017@yandex.ru</a></div>
       <div>Ежедневно с 8:00 до 20:00</div>
