@@ -193,7 +193,7 @@ section{position:relative}
 .card{background:#fff;border-radius:var(--radius);overflow:hidden;box-shadow:0 20px 50px -34px rgba(12,29,22,.55);
   transition:transform .5s cubic-bezier(.16,.8,.3,1),box-shadow .5s;display:flex;flex-direction:column}
 .card:hover{transform:translateY(-8px);box-shadow:0 40px 70px -34px rgba(12,29,22,.55)}
-.card .scene{position:relative;aspect-ratio:16/11;overflow:hidden}
+.card .scene{position:relative;aspect-ratio:16/10;overflow:hidden}
 .card .scene svg{width:100%;height:100%;transition:transform 1.1s cubic-bezier(.16,.8,.3,1)}
 .card:hover .scene svg{transform:scale(1.06)}
 .card .scene img.card-cover{width:100%;height:100%;object-fit:cover;transition:transform 1.1s cubic-bezier(.16,.8,.3,1)}
@@ -571,7 +571,7 @@ houses.forEach((h,i)=>{
 
   card.className='card reveal d'+((i%3)+1);
   const cover = (h.photos && h.photos.length)
-    ? `<img class="card-cover" src="${h.photos[0]}" alt="${h.name}" loading="lazy">`
+    ? `<img class="card-cover" src="${h.photos[0].replace(/\/([^/]+)$/,'/thumb/$1')}" alt="${h.name}" loading="lazy" decoding="async">`
     : scene(h.type);
   card.innerHTML=`
     <a class="scene-link" href="${href}"><div class="scene">${cover}<div class="price-tag">${h.priceFrom?'от ':''}${fmt(h.price)} ₽<small>/сутки</small></div></div></a>

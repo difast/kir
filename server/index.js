@@ -75,7 +75,17 @@ app.post('/api/booking', async (req, res) => {
 
 // ---------- Статика ----------
 const PUBLIC_DIR = path.join(__dirname, '..', 'public');
-app.use(express.static(PUBLIC_DIR));
+app.use(express.static(PUBLIC_DIR, {
+  etag: true,
+  setHeaders(res, filePath) {
+    // фото кешируем надолго, остальное (html/js/css) — без долгого кеша, чтобы правки применялись сразу
+    if (/[\\/]images[\\/]/.test(filePath)) {
+      res.setHeader('Cache-Control', 'public, max-age=2592000, immutable');
+    } else {
+      res.setHeader('Cache-Control', 'no-cache');
+    }
+  },
+}));
 
 // Фолбэк на лендинг.
 app.get('*', (req, res) => {
