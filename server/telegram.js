@@ -123,6 +123,18 @@ function busyInfo(id) {
   const b = store.getBusy(id);
   return b.length ? compactRanges(b) : 'нет занятых дат';
 }
+function overviewKb() {
+  return { inline_keyboard: [
+    [{ text: '🧹 Сбросить занятость по ВСЕМ домам', callback_data: 'busyall:ask' }],
+    [{ text: '← Меню', callback_data: 'menu:main' }],
+  ] };
+}
+function confirmResetAllKb() {
+  return { inline_keyboard: [
+    [{ text: '✅ Да, снять ВСЮ занятость', callback_data: 'busyall:yes' }],
+    [{ text: '✖️ Отмена', callback_data: 'menu:overview' }],
+  ] };
+}
 /** Обзор занятости по всем домам */
 function overviewText() {
   let out = '📅 <b>Занятость по домам</b>\n';
@@ -164,7 +176,7 @@ async function onMessage(msg) {
   if (/^\/(start|help|menu)/.test(text)) { pending.delete(chatId); return send(chatId, menuText, { reply_markup: menuKb() }); }
   if (/^\/price/.test(text)) { pending.delete(chatId); return send(chatId, 'Шаг 1. Выберите дом, цену которого меняем:', { reply_markup: housesKb('price') }); }
   if (/^\/busy|^\/calendar/.test(text)) { pending.delete(chatId); return send(chatId, 'Шаг 1. Выберите дом для управления занятостью:', { reply_markup: housesKb('busy') }); }
-  if (/^\/(overview|occupancy|zanyatost)/.test(text)) { pending.delete(chatId); return send(chatId, overviewText(), { reply_markup: menuKb() }); }
+  if (/^\/(overview|occupancy|zanyatost)/.test(text)) { pending.delete(chatId); return send(chatId, overviewText(), { reply_markup: overviewKb() }); }
 
   const p = pending.get(chatId);
   if (!p) return send(chatId, menuText, { reply_markup: menuKb() });
@@ -243,7 +255,24 @@ async function onCallback(cq) {
   if (data === 'menu:main') { pending.delete(chatId); return send(chatId, menuText, { reply_markup: menuKb() }); }
   if (data === 'menu:price') { pending.delete(chatId); return send(chatId, 'Шаг 1. Выберите дом, цену которого меняем:', { reply_markup: housesKb('price') }); }
   if (data === 'menu:busy') { pending.delete(chatId); return send(chatId, 'Шаг 1. Выберите дом для управления занятостью:', { reply_markup: housesKb('busy') }); }
-  if (data === 'menu:overview') { pending.delete(chatId); return send(chatId, overviewText(), { reply_markup: menuKb() }); }
+  if (data === 'menu:overview') { pending.delete(chatId); return send(chatId, overviewText(), { reply_markup: overviewKb() }); }
+
+  if (data === 'busyall:ask') {
+    pending.delete(chatId);
+    const total = HOUSES.reduce((s, h) => s + store.getBusy(h.id).length, 0);
+    return send(chatId,
+      `⚠️ <b>Внимание!</b>\n\n` +
+      `Сейчас будет снята <b>вся занятость по всем домам</b> — сразу освободятся все занятые даты ` +
+      `(сейчас занято дней всего: <b>${total}</b>). Это действие <b>нельзя отменить</b>.\n\n` +
+      `Точно продолжить?`,
+      { reply_markup: confirmResetAllKb() });
+  }
+  if (data === 'busyall:yes') {
+    pending.delete(chatId);
+    let cleared = 0;
+    HOUSES.forEach((h) => { const b = store.getBusy(h.id); if (b.length) { store.setBusyDates(h.id, b, false); cleared += b.length; } });
+    return send(chatId, `🧹 Готово. Снята вся занятость по всем домам (освобождено дней: <b>${cleared}</b>). Все даты свободны.`, { reply_markup: menuKb() });
+  }
 
   const parts = data.split(':');
   const kind = parts[0];
