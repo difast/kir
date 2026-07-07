@@ -54,10 +54,19 @@ function buildTelegramHtml(b, ref) {
   ].join('\n');
 }
 
+/**
+ * Значения по умолчанию для Telegram. Приоритет у переменных окружения:
+ * на Railway задайте TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID — они переопределят эти.
+ * ВНИМАНИЕ: токен лежит в коде для «работает из коробки». Безопаснее держать его
+ * только в переменных окружения (и перевыпустить бота у @BotFather, т.к. токен засветился).
+ */
+const TELEGRAM_BOT_TOKEN_DEFAULT = '8868119198:AAH11Ded58ig6pbq2U4xFSdrJ3-ZouNMyUk';
+const TELEGRAM_CHAT_ID_DEFAULT = '7738750071';
+
 /** Отправка в Telegram через Bot API (без лишних зависимостей — глобальный fetch) */
 async function sendTelegram(b, ref) {
-  const token = process.env.TELEGRAM_BOT_TOKEN;
-  const chatId = process.env.TELEGRAM_CHAT_ID;
+  const token = process.env.TELEGRAM_BOT_TOKEN || TELEGRAM_BOT_TOKEN_DEFAULT;
+  const chatId = process.env.TELEGRAM_CHAT_ID || TELEGRAM_CHAT_ID_DEFAULT;
   if (!token || !chatId) {
     throw new Error('Telegram не сконфигурирован (нет TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID)');
   }
