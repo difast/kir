@@ -74,6 +74,11 @@
             <div class="line"><span>Выберите даты, чтобы рассчитать стоимость</span></div>
           </div>
 
+          <label class="consent" id="g-consent">
+            <input type="checkbox" id="f-consent">
+            <span>Я согласен с <a href="/privacy.html" target="_blank" rel="noopener">политикой конфиденциальности</a> и даю согласие на обработку персональных данных.</span>
+          </label>
+
           <div class="submit-err" id="submitErr"></div>
           <button class="submit" id="submitBtn">Отправить заявку</button>
         </div>
@@ -204,6 +209,8 @@
     document.getElementById('f-name').value = '';
     document.getElementById('f-phone').value = '';
     document.getElementById('f-company').value = '';
+    document.getElementById('f-consent').checked = false;
+    document.getElementById('g-consent').classList.remove('invalid');
     document.getElementById('submitErr').style.display = 'none';
     open(fHouse.value);
   }
@@ -232,6 +239,9 @@
     setErr('g-out', !elOut.value || nights() < 1);
     setErr('g-name', name.length < 2);
     setErr('g-phone', phone.replace(/\D/g, '').length < 10);
+    const consent = document.getElementById('f-consent').checked;
+    document.getElementById('g-consent').classList.toggle('invalid', !consent);
+    if (!consent) ok = false;
     if (!ok) return;
 
     const h = houses.find((x) => x.id === fHouse.value), n = nights(), total = rangeTotal(h).total;
