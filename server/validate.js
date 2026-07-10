@@ -5,6 +5,9 @@ const store = require('./store');
 
 const MS_DAY = 24 * 60 * 60 * 1000;
 
+/** Минимальный срок бронирования — 5 ночей во всех домах */
+const MIN_NIGHTS = 5;
+
 /** YYYY-MM-DD -> Date (UTC, полночь) или null */
 function parseDate(str) {
   if (typeof str !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(str)) return null;
@@ -49,8 +52,8 @@ function validateBooking(body) {
   }
 
   const nights = Math.round((checkOut - checkIn) / MS_DAY);
-  if (nights < 1) {
-    return { ok: false, error: 'Минимальный срок — 1 сутки' };
+  if (nights < MIN_NIGHTS) {
+    return { ok: false, error: `Минимальный срок бронирования — ${MIN_NIGHTS} ночей` };
   }
 
   let guests = parseInt(body.guests, 10);

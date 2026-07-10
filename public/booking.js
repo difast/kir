@@ -5,9 +5,12 @@
 (function () {
   "use strict";
   const fmt = (n) => n.toLocaleString('ru-RU');
+  const MIN_NIGHTS = 5; // минимальный срок бронирования во всех домах
   const houses = (window.__HOUSES__ || []).filter((h) => h.status !== 'renovation');
   const iso = (d) => d.toISOString().split('T')[0];
-  const today = new Date(), tomorrow = new Date(Date.now() + 864e5), dayAfter = new Date(Date.now() + 2 * 864e5);
+  const today = new Date(), tomorrow = new Date(Date.now() + 864e5);
+  // дефолтный выезд — на MIN_NIGHTS ночей позже заезда (заезд по умолчанию — завтра)
+  const defaultOut = new Date(Date.now() + (1 + MIN_NIGHTS) * 864e5);
 
   // ---------- разметка модалки ----------
   const wrap = document.createElement('div');
@@ -169,6 +172,7 @@
   function calcSummary() {
     const h = houses.find((x) => x.id === fHouse.value), n = nights();
     if (!h || n < 1) { summary.innerHTML = '<div class="line"><span>Выберите даты, чтобы рассчитать стоимость</span></div>'; return; }
+    if (n < MIN_NIGHTS) { summary.innerHTML = `<div class="line" style="color:var(--clay);font-weight:600"><span>Минимальный срок бронирования — ${MIN_NIGHTS} ночей</span></div>`; return; }
     if (rangeBusy(h)) { summary.innerHTML = '<div class="line" style="color:var(--clay);font-weight:600"><span>На эти даты дом занят — выберите другие</span></div>'; return; }
     const r = rangeTotal(h);
     const label = r.allBase
@@ -197,7 +201,7 @@
     const gEl = (x) => document.getElementById(x);
     const si = gEl('s-in') && gEl('s-in').value, so = gEl('s-out') && gEl('s-out').value, sg = gEl('s-guests') && gEl('s-guests').value;
     if (!elIn.value) elIn.value = si || iso(tomorrow);
-    if (!elOut.value) elOut.value = so || iso(dayAfter);
+    if (!elOut.value) elOut.value = so || iso(defaultOut);
     if (sg) fHouse.value && (gEl('f-guests').value = sg);
     if (id) fHouse.value = id;
     updateHouseLabel(); calcSummary();
@@ -251,6 +255,14 @@
     errBox.style.display = 'none';
 
     if (hp) { showSuccess(h, n, total, name, 'ZG-000000'); return; } // honeypot: бот
+
+    // минимальный срок — 5 ночей во всех домах
+    if (n < MIN_NIGHTS) {
+      document.getElementById('g-out').classList.add('invalid');
+      errBox.textContent = `Минимальный срок бронирования — ${MIN_NIGHTS} ночей.`;
+      errBox.style.display = 'block';
+      return;
+    }
 
     // занятые даты — не даём отправить
     if (rangeBusy(h)) {
