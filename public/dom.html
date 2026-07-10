@@ -256,7 +256,7 @@ if(!h){
   const galleryHtml = (h.photos && h.photos.length)
     ? `<div class="block gallery-block">
         <div class="gallery" id="gallery">
-          <div class="gal-stage"><img class="gal-img" id="galA" alt="Фото — ${esc(h.name)}"><img class="gal-img" id="galB" alt=""></div>
+          <div class="gal-stage"><img class="gal-img" id="galA" alt="Фото — ${esc(h.name)}" fetchpriority="high" decoding="async"><img class="gal-img" id="galB" alt="" decoding="async"></div>
           <button class="gal-nav gal-prev" id="galPrev" aria-label="Предыдущее фото">‹</button>
           <button class="gal-nav gal-next" id="galNext" aria-label="Следующее фото">›</button>
           <div class="gal-count"><span id="galCur">1</span>/<span id="galTot"></span></div>
