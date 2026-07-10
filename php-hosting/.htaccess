@@ -1,0 +1,30 @@
+# --- Роутинг API на PHP ---
+RewriteEngine On
+
+# Всё, что начинается с /api/, обрабатывает api/index.php
+# (кроме реально существующего файла setup-webhook.php — он открывается напрямую).
+RewriteCond %{REQUEST_URI} !^/api/setup-webhook\.php$
+RewriteRule ^api/(.*)$ api/index.php [L,QSA]
+
+# --- Кэш статики (фото на 30 дней, остальное без долгого кэша) ---
+<IfModule mod_headers.c>
+  <FilesMatch "\.(jpg|jpeg|png|webp|gif|svg|ico)$">
+    Header set Cache-Control "public, max-age=2592000, immutable"
+  </FilesMatch>
+  <FilesMatch "\.(html|css|js)$">
+    Header set Cache-Control "no-cache"
+  </FilesMatch>
+</IfModule>
+
+# --- Сжатие текстовых ответов ---
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css application/javascript application/json image/svg+xml
+</IfModule>
+
+# Защита конфигурации от прямого доступа
+<Files "config.php">
+  Require all denied
+</Files>
+<Files "config.example.php">
+  Require all denied
+</Files>
