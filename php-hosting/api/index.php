@@ -46,12 +46,21 @@ if (strpos($path, 'tg/webhook/') === 0 && $method === 'POST') {
   $raw = file_get_contents('php://input');
   $update = json_decode($raw, true);
 
-  // Быстро подтверждаем Telegram, обработку делаем после закрытия соединения.
-  http_response_code(200);
-  header('Content-Type: text/plain; charset=utf-8');
+  // Мгновенно отвечаем Telegram «200», а обработку (исходящие sendMessage)
+  // доделываем ПОСЛЕ закрытия соединения — иначе Telegram ждёт наши вызовы и
+  // получает «Connection timed out». Работает и в FPM, и в CGI-режиме хостинга.
   ignore_user_abort(true);
+  @set_time_limit(30);
+  http_response_code(200);
+  while (ob_get_level() > 0) { ob_end_clean(); }
+  ob_start();
+  echo 'ok';
+  header('Content-Type: text/plain; charset=utf-8');
+  header('Content-Length: ' . ob_get_length());
+  header('Connection: close');
+  ob_end_flush();
+  flush();
   if (function_exists('fastcgi_finish_request')) {
-    echo 'ok';
     fastcgi_finish_request();
   }
   if (is_array($update)) tg_process_update($update);
